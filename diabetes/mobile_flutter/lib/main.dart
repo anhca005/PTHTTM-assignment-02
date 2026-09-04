@@ -95,7 +95,7 @@ class DiabetesPredictScreen extends StatefulWidget {
 }
 
 class _DiabetesPredictScreenState extends State<DiabetesPredictScreen> {
-  final apiUrlCtrl = TextEditingController(text: 'http://192.168.1.10:8000');
+  final apiUrlCtrl = TextEditingController(text: 'https://diabetes-api-q1ke.onrender.com');
   final ageCtrl = TextEditingController(text: '45');
   final bmiCtrl = TextEditingController(text: '24.5');
   final hba1cCtrl = TextEditingController(text: '5.7');

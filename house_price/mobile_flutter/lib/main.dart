@@ -106,7 +106,7 @@ class HousePricePredictScreen extends StatefulWidget {
 }
 
 class _HousePricePredictScreenState extends State<HousePricePredictScreen> {
-  final apiUrlCtrl = TextEditingController(text: 'http://192.168.1.10:8001');
+  final apiUrlCtrl = TextEditingController(text: 'https://house-price-api-uglg.onrender.com');
   final areaCtrl = TextEditingController(text: '60');
   final frontageCtrl = TextEditingController(text: '4.5');
   final accessRoadCtrl = TextEditingController(text: '6');

@@ -105,7 +105,7 @@ class EcommercePredictScreen extends StatefulWidget {
 class _EcommercePredictScreenState extends State<EcommercePredictScreen> with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
-  final apiUrlCtrl = TextEditingController(text: 'http://192.168.1.10:8002');
+  final apiUrlCtrl = TextEditingController(text: 'https://ecommerce-api-0tov.onrender.com');
 
   // Tab 1 Controllers & State
   final ageCtrl = TextEditingController(text: '35');
