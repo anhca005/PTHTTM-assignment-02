@@ -38,7 +38,7 @@ class _EcommerceAppState extends State<EcommerceApp> {
           surface: cardColor,
         ),
         scaffoldBackgroundColor: bgColor,
-        cardTheme: CardTheme(
+        cardTheme: CardThemeData(
           color: cardColor,
           elevation: 2,
           shadowColor: Colors.purple.withOpacity(0.08),
@@ -57,7 +57,7 @@ class _EcommerceAppState extends State<EcommerceApp> {
           surface: cardColor,
         ),
         scaffoldBackgroundColor: bgColor,
-        cardTheme: CardTheme(
+        cardTheme: CardThemeData(
           color: cardColor,
           elevation: 0,
           shape: RoundedRectangleBorder(

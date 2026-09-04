@@ -38,7 +38,7 @@ class _HousePriceAppState extends State<HousePriceApp> {
           surface: cardColor,
         ),
         scaffoldBackgroundColor: bgColor,
-        cardTheme: CardTheme(
+        cardTheme: CardThemeData(
           color: cardColor,
           elevation: 2,
           shadowColor: Colors.black.withOpacity(0.05),
@@ -57,7 +57,7 @@ class _HousePriceAppState extends State<HousePriceApp> {
           surface: cardColor,
         ),
         scaffoldBackgroundColor: bgColor,
-        cardTheme: CardTheme(
+        cardTheme: CardThemeData(
           color: cardColor,
           elevation: 0,
           shape: RoundedRectangleBorder(
