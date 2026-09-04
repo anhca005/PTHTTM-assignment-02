@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="theme-color" content="#0f172a" />
+<link rel="manifest" href="manifest.json" />
+<title>House Price Check — Mobile</title>
+<style>
+  :root { --bg:#0f172a; --card:#1e293b; --accent:#f59e0b; --text:#e2e8f0; --muted:#94a3b8; --danger:#f87171; }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family: -apple-system, Segoe UI, Roboto, sans-serif; background:var(--bg); color:var(--text); padding:16px; }
+  h1 { font-size: 1.2rem; margin-bottom: 2px; }
+  .sub { color: var(--muted); margin-top:0; margin-bottom: 14px; font-size: .8rem; }
+  .card { background: var(--card); border-radius: 14px; padding: 16px; margin-bottom: 14px; }
+  label { display:block; font-size:.78rem; color:var(--muted); margin: 10px 0 4px; }
+  input, select { width:100%; padding:11px 10px; border-radius:8px; border:1px solid #334155; background:#0f172a; color:var(--text); font-size:1rem; }
+  button { width:100%; margin-top:18px; padding:15px; border:none; border-radius:10px; background:var(--accent); color:#1c1300; font-weight:700; font-size:1rem; }
+  #result { text-align:center; font-size:1.3rem; font-weight:800; margin-top:4px; min-height:1.4em; color: var(--accent); }
+  #result.err { color: var(--danger); font-size: .85rem; font-weight: 400; }
+  #apiRow { font-size:.72rem; color:var(--muted); margin-bottom:10px; }
+  #apiRow input { font-size:.72rem; padding:6px; }
+</style>
+</head>
+<body>
+
+<h1>🏠 House Price Check</h1>
+<p class="sub">Mobile client — sends listing details to the prediction API and shows the estimated price.</p>
+
+<div id="apiRow">
+  API: <input id="apiUrl" value="http://localhost:8001" />
+</div>
+
+<div class="card">
+  <label>Area (m²)</label>
+  <input id="Area" type="number" step="0.1" value="60" />
+
+  <label>Frontage (m)</label>
+  <input id="Frontage" type="number" step="0.1" value="4.5" />
+
+  <label>Access road width (m)</label>
+  <input id="AccessRoad" type="number" step="0.1" value="6" />
+
+  <label>Floors</label>
+  <input id="Floors" type="number" value="3" />
+
+  <label>Bedrooms</label>
+  <input id="Bedrooms" type="number" value="3" />
+
+  <label>Bathrooms</label>
+  <input id="Bathrooms" type="number" value="2" />
+
+  <label>Legal status</label>
+  <select id="LegalStatus">
+    <option>Have certificate</option><option>Sale contract</option><option>Unknown</option>
+  </select>
+
+  <label>Furniture state</label>
+  <select id="FurnitureState">
+    <option>Full</option><option>Basic</option><option>Unknown</option>
+  </select>
+
+  <label>House direction</label>
+  <select id="HouseDirection">
+    <option>Unknown</option><option>Đông</option><option>Tây</option><option>Nam</option><option>Bắc</option>
+    <option>Đông - Nam</option><option>Đông - Bắc</option><option>Tây - Nam</option><option>Tây - Bắc</option>
+  </select>
+
+  <label>Balcony direction</label>
+  <select id="BalconyDirection">
+    <option>Unknown</option><option>Đông</option><option>Tây</option><option>Nam</option><option>Bắc</option>
+    <option>Đông - Nam</option><option>Đông - Bắc</option><option>Tây - Nam</option><option>Tây - Bắc</option>
+  </select>
+
+  <label>Province / City</label>
+  <select id="ProvinceGroup">
+    <option>Hà Nội</option><option>Hồ Chí Minh</option><option>Bình Dương</option><option>Đà Nẵng</option>
+    <option>Đồng Nai</option><option>Hải Phòng</option><option>Khánh Hòa</option><option>Hưng Yên</option>
+    <option>Long An</option><option>Bà Rịa Vũng Tàu</option><option>Bắc Ninh</option><option>Bình Thuận</option>
+    <option>Khac</option>
+  </select>
+
+  <button id="btn">Predict Price</button>
+  <div id="result"></div>
+</div>
+
+<script>
+document.getElementById("btn").addEventListener("click", async () => {
+  const base = document.getElementById("apiUrl").value.replace(/\/$/, "");
+  const resultEl = document.getElementById("result");
+  resultEl.className = "";
+  resultEl.textContent = "Calling API...";
+
+  const payload = {
+    "Area": parseFloat(document.getElementById("Area").value),
+    "Frontage": parseFloat(document.getElementById("Frontage").value),
+    "Access Road": parseFloat(document.getElementById("AccessRoad").value),
+    "Floors": parseFloat(document.getElementById("Floors").value),
+    "Bedrooms": parseFloat(document.getElementById("Bedrooms").value),
+    "Bathrooms": parseFloat(document.getElementById("Bathrooms").value),
+    "Legal status": document.getElementById("LegalStatus").value,
+    "Furniture state": document.getElementById("FurnitureState").value,
+    "House direction": document.getElementById("HouseDirection").value,
+    "Balcony direction": document.getElementById("BalconyDirection").value,
+    "ProvinceGroup": document.getElementById("ProvinceGroup").value,
+  };
+
+  try {
+    const res = await fetch(base + "/predict", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const data = await res.json();
+    resultEl.textContent = data.predicted_price.toLocaleString() + " " + data.predicted_price_unit;
+    resultEl.className = "";
+  } catch (err) {
+    resultEl.textContent = "Error: " + err.message;
+    resultEl.className = "err";
+  }
+});
+</script>
+</body>
+</html>

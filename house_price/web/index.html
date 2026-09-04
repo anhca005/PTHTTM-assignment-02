@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>🏠 Real Estate AI Price Valuation — Web Client</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-dark: #0B0F19;
+    --card-bg: rgba(30, 41, 59, 0.7);
+    --card-border: rgba(51, 65, 85, 0.6);
+    --accent: #F59E0B;
+    --accent-hover: #D97706;
+    --text: #F8FAFC;
+    --muted: #94A3B8;
+    --danger: #EF4444;
+    --danger-bg: rgba(239, 68, 68, 0.12);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+    background: var(--bg-dark);
+    background-image: 
+      radial-gradient(at 10% 10%, rgba(245, 158, 11, 0.08) 0px, transparent 50%),
+      radial-gradient(at 90% 90%, rgba(59, 130, 246, 0.06) 0px, transparent 50%);
+    background-attachment: fixed;
+    color: var(--text);
+    padding: 32px 16px;
+    min-height: 100vh;
+  }
+  .container { max-width: 1060px; margin: 0 auto; }
+  
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--card-border);
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .brand { display: flex; align-items: center; gap: 14px; }
+  .brand-icon {
+    width: 46px; height: 46px;
+    background: rgba(245, 158, 11, 0.15);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px;
+  }
+  h1 { font-size: 1.5rem; margin: 0; font-weight: 800; }
+  .subtitle { font-size: 0.85rem; color: var(--muted); margin-top: 2px; }
+
+  .lang-btn {
+    background: rgba(30, 41, 59, 0.8);
+    border: 1px solid var(--card-border);
+    color: var(--text);
+    padding: 8px 14px;
+    border-radius: 10px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+  }
+  .lang-btn:hover { background: var(--accent); color: #000; border-color: var(--accent); }
+
+  .server-bar {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    backdrop-filter: blur(12px);
+    border-radius: 14px;
+    padding: 14px 20px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .server-bar label { font-size: 0.85rem; font-weight: 600; color: var(--accent); white-space: nowrap; }
+  .server-bar input {
+    flex: 1;
+    background: #0F172A;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    padding: 8px 14px;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 0.9rem;
+  }
+
+  .grid { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 24px; }
+  @media (max-width: 860px) { .grid { grid-template-columns: 1fr; } }
+  
+  .card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    backdrop-filter: blur(12px);
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
+  }
+  .section-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin-top: 0;
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--accent);
+  }
+  
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+  @media (max-width: 600px) { .grid3 { grid-template-columns: 1fr; } }
+
+  .form-group { margin-bottom: 16px; }
+  .form-group label {
+    display: block;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  .form-control {
+    width: 100%;
+    padding: 11px 14px;
+    border-radius: 10px;
+    border: 1px solid #334155;
+    background: #0F172A;
+    color: var(--text);
+    font-size: 0.95rem;
+    font-family: inherit;
+    transition: all 0.2s;
+  }
+  .form-control:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2);
+  }
+
+  /* Counter styling */
+  .counter-box {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #0F172A;
+    border: 1px solid #334155;
+    border-radius: 10px;
+    padding: 6px 12px;
+  }
+  .counter-btn {
+    width: 28px; height: 28px;
+    border-radius: 6px;
+    border: none;
+    background: #1E293B;
+    color: var(--text);
+    font-weight: bold;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .counter-btn:hover { background: var(--accent); color: #000; }
+  
+  .submit-btn {
+    width: 100%;
+    padding: 14px;
+    margin-top: 10px;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+    color: #000;
+    font-weight: 800;
+    font-size: 1rem;
+    cursor: pointer;
+    box-shadow: 0 6px 20px rgba(245, 158, 11, 0.3);
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .submit-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(245, 158, 11, 0.4); }
+  .submit-btn:active { transform: translateY(1px); }
+  
+  .result-card {
+    min-height: 260px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    border-radius: 14px;
+    padding: 24px;
+    background: rgba(30, 27, 19, 0.8);
+    border: 1.5px solid var(--accent);
+    transition: all 0.3s;
+  }
+  .result-card.placeholder { background: rgba(15, 23, 42, 0.5); border: 2px dashed #334155; }
+  
+  .price-tag {
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: var(--accent);
+    margin: 10px 0;
+    text-shadow: 0 2px 10px rgba(245, 158, 11, 0.2);
+  }
+  
+  pre {
+    background: #0F172A;
+    border: 1px solid #334155;
+    padding: 12px;
+    border-radius: 10px;
+    overflow-x: auto;
+    font-size: 0.78rem;
+    color: var(--accent);
+    max-height: 180px;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <div class="brand">
+      <div class="brand-icon">🏠</div>
+      <div>
+        <h1>Real Estate AI Valuation</h1>
+        <div class="subtitle" id="i18n-sub">Định giá Bất động sản thông minh — Web Client (FastAPI)</div>
+      </div>
+    </div>
+
+    <!-- Language Selector Button -->
+    <button class="lang-btn" id="langBtn" onclick="toggleLang()">
+      <span id="langFlag">🌐</span> <span id="langText">EN</span>
+    </button>
+  </header>
+
+  <div class="server-bar">
+    <label id="i18n-server-lbl">🌐 API Base URL:</label>
+    <input id="apiUrl" value="http://localhost:8001" placeholder="http://localhost:8001" />
+  </div>
+
+  <div class="grid">
+    <!-- Form Card -->
+    <div class="card">
+      <form id="houseForm">
+        <div class="section-title" id="i18n-sec1">📍 1. Vị trí & Pháp lý</div>
+        
+        <div class="form-group">
+          <label for="ProvinceGroup" id="i18n-lbl-prov">Tỉnh / Thành phố</label>
+          <select id="ProvinceGroup" class="form-control">
+            <option value="Hà Nội" selected>Hà Nội</option>
+            <option value="Hồ Chí Minh">Hồ Chí Minh</option>
+            <option value="Bình Dương">Bình Dương</option>
+            <option value="Đà Nẵng">Đà Nẵng</option>
+            <option value="Đồng Nai">Đồng Nai</option>
+            <option value="Hải Phòng">Hải Phòng</option>
+            <option value="Khánh Hòa">Khánh Hòa</option>
+            <option value="Hưng Yên">Hưng Yên</option>
+            <option value="Long An">Long An</option>
+            <option value="Bà Rịa Vũng Tàu">Bà Rịa Vũng Tàu</option>
+            <option value="Bắc Ninh">Bắc Ninh</option>
+            <option value="Bình Thuận">Bình Thuận</option>
+            <option value="Khac">Tỉnh/Thành khác</option>
+          </select>
+        </div>
+
+        <div class="grid2">
+          <div class="form-group">
+            <label for="LegalStatus" id="i18n-lbl-legal">Tình trạng pháp lý</label>
+            <select id="LegalStatus" class="form-control">
+              <option value="Have certificate" selected id="i18n-opt-legal1">📜 Sổ đỏ / Sổ hồng</option>
+              <option value="Sale contract" id="i18n-opt-legal2">📝 Hợp đồng mua bán</option>
+              <option value="Unknown" id="i18n-opt-legal3">❓ Chưa xác định</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="FurnitureState" id="i18n-lbl-furn">Tình trạng nội thất</label>
+            <select id="FurnitureState" class="form-control">
+              <option value="Full" selected id="i18n-opt-furn1">🛋️ Đầy đủ nội thất</option>
+              <option value="Basic" id="i18n-opt-furn2">🏠 Nội thất cơ bản</option>
+              <option value="Unknown" id="i18n-opt-furn3">📦 Bàn giao thô / Khác</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="section-title" style="margin-top:20px;" id="i18n-sec2">📐 2. Thông số Kích thước & Đường vào</div>
+        
+        <div class="grid3">
+          <div class="form-group">
+            <label for="Area" id="i18n-lbl-area">Diện tích (m²)</label>
+            <input type="number" step="0.1" id="Area" class="form-control" value="60" required>
+          </div>
+          <div class="form-group">
+            <label for="Frontage" id="i18n-lbl-front">Mặt tiền (m)</label>
+            <input type="number" step="0.1" id="Frontage" class="form-control" value="4.5" required>
+          </div>
+          <div class="form-group">
+            <label for="AccessRoad" id="i18n-lbl-road">Đường vào (m)</label>
+            <input type="number" step="0.1" id="AccessRoad" class="form-control" value="6" required>
+          </div>
+        </div>
+
+        <div class="section-title" style="margin-top:20px;" id="i18n-sec3">🧱 3. Quy mô & Hướng nhà</div>
+        
+        <div class="grid3">
+          <div class="form-group">
+            <label id="i18n-lbl-floors">Số tầng</label>
+            <div class="counter-box">
+              <button type="button" class="counter-btn" onclick="adjustCount('Floors', -1)">-</button>
+              <span id="FloorsVal" style="font-weight:bold;">3</span>
+              <button type="button" class="counter-btn" onclick="adjustCount('Floors', 1)">+</button>
+            </div>
+            <input type="hidden" id="Floors" value="3">
+          </div>
+          
+          <div class="form-group">
+            <label id="i18n-lbl-beds">Phòng ngủ</label>
+            <div class="counter-box">
+              <button type="button" class="counter-btn" onclick="adjustCount('Bedrooms', -1)">-</button>
+              <span id="BedroomsVal" style="font-weight:bold;">3</span>
+              <button type="button" class="counter-btn" onclick="adjustCount('Bedrooms', 1)">+</button>
+            </div>
+            <input type="hidden" id="Bedrooms" value="3">
+          </div>
+
+          <div class="form-group">
+            <label id="i18n-lbl-baths">Phòng tắm</label>
+            <div class="counter-box">
+              <button type="button" class="counter-btn" onclick="adjustCount('Bathrooms', -1)">-</button>
+              <span id="BathroomsVal" style="font-weight:bold;">2</span>
+              <button type="button" class="counter-btn" onclick="adjustCount('Bathrooms', 1)">+</button>
+            </div>
+            <input type="hidden" id="Bathrooms" value="2">
+          </div>
+        </div>
+
+        <div class="grid2" style="margin-top:8px;">
+          <div class="form-group">
+            <label for="HouseDirection" id="i18n-lbl-hdir">Hướng nhà</label>
+            <select id="HouseDirection" class="form-control">
+              <option value="Unknown">Unknown</option>
+              <option value="Đông">Đông</option>
+              <option value="Tây">Tây</option>
+              <option value="Nam">Nam</option>
+              <option value="Bắc">Bắc</option>
+              <option value="Đông - Nam">Đông - Nam</option>
+              <option value="Đông - Bắc">Đông - Bắc</option>
+              <option value="Tây - Nam">Tây - Nam</option>
+              <option value="Tây - Bắc">Tây - Bắc</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="BalconyDirection" id="i18n-lbl-bdir">Hướng ban công</label>
+            <select id="BalconyDirection" class="form-control">
+              <option value="Unknown">Unknown</option>
+              <option value="Đông">Đông</option>
+              <option value="Tây">Tây</option>
+              <option value="Nam">Nam</option>
+              <option value="Bắc">Bắc</option>
+              <option value="Đông - Nam">Đông - Nam</option>
+              <option value="Đông - Bắc">Đông - Bắc</option>
+              <option value="Tây - Nam">Tây - Nam</option>
+              <option value="Tây - Bắc">Tây - Bắc</option>
+            </select>
+          </div>
+        </div>
+
+        <button type="submit" class="submit-btn" id="submitBtn">
+          🏷️ Định Giá Ngay (AI Valuation)
+        </button>
+      </form>
+    </div>
+
+    <!-- Output Card -->
+    <div>
+      <div class="card">
+        <div class="section-title" id="i18n-sec-res">📊 Giá trị Ước tính</div>
+        <div id="resultContainer" class="result-card placeholder">
+          <div style="font-size: 40px; margin-bottom: 10px;">🏠</div>
+          <p style="color:var(--muted); margin:0;" id="i18n-placeholder-msg">Nhập thông tin bất động sản và bấm nút <strong>Định Giá Ngay</strong> để xem kết quả.</p>
+        </div>
+
+        <h4 style="margin-top:24px; margin-bottom:8px; font-size:0.85rem; color:var(--muted);">Raw JSON Response:</h4>
+        <pre id="rawResponse">—</pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let currentLang = 'vi';
+
+const i18n = {
+  vi: {
+    sub: "Định giá Bất động sản thông minh — Web Client (FastAPI)",
+    serverLbl: "🌐 API Base URL:",
+    sec1: "📍 1. Vị trí & Pháp lý",
+    prov: "Tỉnh / Thành phố",
+    legal: "Tình trạng pháp lý",
+    legal1: "📜 Sổ đỏ / Sổ hồng", legal2: "📝 Hợp đồng mua bán", legal3: "❓ Chưa xác định",
+    furn: "Tình trạng nội thất",
+    furn1: "🛋️ Đầy đủ nội thất", furn2: "🏠 Nội thất cơ bản", furn3: "📦 Bàn giao thô / Khác",
+    sec2: "📐 2. Thông số Kích thước & Đường vào",
+    area: "Diện tích (m²)", front: "Mặt tiền (m)", road: "Đường vào (m)",
+    sec3: "🧱 3. Quy mô & Hướng nhà",
+    floors: "Số tầng", beds: "Phòng ngủ", baths: "Phòng tắm",
+    hdir: "Hướng nhà", bdir: "Hướng ban công",
+    submitBtn: "🏷️ Định Giá Ngay (AI Valuation)",
+    secRes: "📊 Giá trị Ước tính",
+    placeholderMsg: "Nhập thông tin bất động sản và bấm nút <strong>Định Giá Ngay</strong> để xem kết quả."
+  },
+  en: {
+    sub: "Smart Real Estate AI Valuation — Web Client (FastAPI)",
+    serverLbl: "🌐 API Base URL:",
+    sec1: "📍 1. Location & Legal Status",
+    prov: "Province / City",
+    legal: "Legal Status",
+    legal1: "📜 Title Deed / Certificate", legal2: "📝 Sale Contract", legal3: "❓ Unknown",
+    furn: "Furniture Condition",
+    furn1: "🛋️ Fully Furnished", furn2: "🏠 Basic Furnished", furn3: "📦 Bare Shell / Unfurnished",
+    sec2: "📐 2. Dimensions & Access Road",
+    area: "Area (m²)", front: "Frontage (m)", road: "Access Road (m)",
+    sec3: "🧱 3. Scale & Orientation",
+    floors: "Floors", beds: "Bedrooms", baths: "Bathrooms",
+    hdir: "House Direction", bdir: "Balcony Direction",
+    submitBtn: "🏷️ Calculate Valuation with AI",
+    secRes: "📊 Estimated Property Value",
+    placeholderMsg: "Fill property details and click <strong>Calculate Valuation with AI</strong> to view results."
+  }
+};
+
+function toggleLang() {
+  currentLang = currentLang === 'vi' ? 'en' : 'vi';
+  document.getElementById('langText').textContent = currentLang === 'vi' ? 'EN' : 'VI';
+  applyTranslations();
+}
+
+function applyTranslations() {
+  const t = i18n[currentLang];
+  document.getElementById('i18n-sub').textContent = t.sub;
+  document.getElementById('i18n-server-lbl').textContent = t.serverLbl;
+  document.getElementById('i18n-sec1').textContent = t.sec1;
+  document.getElementById('i18n-lbl-prov').textContent = t.prov;
+  document.getElementById('i18n-lbl-legal').textContent = t.legal;
+  document.getElementById('i18n-opt-legal1').textContent = t.legal1;
+  document.getElementById('i18n-opt-legal2').textContent = t.legal2;
+  document.getElementById('i18n-opt-legal3').textContent = t.legal3;
+  document.getElementById('i18n-lbl-furn').textContent = t.furn;
+  document.getElementById('i18n-opt-furn1').textContent = t.furn1;
+  document.getElementById('i18n-opt-furn2').textContent = t.furn2;
+  document.getElementById('i18n-opt-furn3').textContent = t.furn3;
+  document.getElementById('i18n-sec2').textContent = t.sec2;
+  document.getElementById('i18n-lbl-area').textContent = t.area;
+  document.getElementById('i18n-lbl-front').textContent = t.front;
+  document.getElementById('i18n-lbl-road').textContent = t.road;
+  document.getElementById('i18n-sec3').textContent = t.sec3;
+  document.getElementById('i18n-lbl-floors').textContent = t.floors;
+  document.getElementById('i18n-lbl-beds').textContent = t.beds;
+  document.getElementById('i18n-lbl-baths').textContent = t.baths;
+  document.getElementById('i18n-lbl-hdir').textContent = t.hdir;
+  document.getElementById('i18n-lbl-bdir').textContent = t.bdir;
+  document.getElementById('submitBtn').innerHTML = t.submitBtn;
+  document.getElementById('i18n-sec-res').textContent = t.secRes;
+
+  const ph = document.getElementById('i18n-placeholder-msg');
+  if (ph) ph.innerHTML = t.placeholderMsg;
+}
+
+function adjustCount(id, delta) {
+  const input = document.getElementById(id);
+  const valSpan = document.getElementById(id + 'Val');
+  let current = parseInt(input.value) || 0;
+  current = Math.max(0, current + delta);
+  input.value = current;
+  valSpan.textContent = current;
+}
+
+document.getElementById('houseForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const base = document.getElementById('apiUrl').value.trim().replace(/\/+$/, '');
+  const submitBtn = document.getElementById('submitBtn');
+  const resContainer = document.getElementById('resultContainer');
+  const rawEl = document.getElementById('rawResponse');
+
+  const area = parseFloat(document.getElementById('Area').value) || 0;
+  const payload = {
+    "Area": area,
+    "Frontage": parseFloat(document.getElementById('Frontage').value) || 0,
+    "Access Road": parseFloat(document.getElementById('AccessRoad').value) || 0,
+    "Floors": parseFloat(document.getElementById('Floors').value) || 0,
+    "Bedrooms": parseFloat(document.getElementById('Bedrooms').value) || 0,
+    "Bathrooms": parseFloat(document.getElementById('Bathrooms').value) || 0,
+    "Legal status": document.getElementById('LegalStatus').value,
+    "Furniture state": document.getElementById('FurnitureState').value,
+    "House direction": document.getElementById('HouseDirection').value,
+    "Balcony direction": document.getElementById('BalconyDirection').value,
+    "ProvinceGroup": document.getElementById('ProvinceGroup').value
+  };
+
+  submitBtn.disabled = true;
+  submitBtn.innerHTML = currentLang === 'vi' ? '⏳ Đang tính toán...' : '⏳ Calculating...';
+  resContainer.className = 'result-card placeholder';
+  resContainer.innerHTML = '<p style="color:var(--accent)">Calling AI Model...</p>';
+
+  try {
+    const res = await fetch(base + '/predict', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    if (!res.ok) throw new Error('HTTP status ' + res.status);
+    const data = await res.json();
+    rawEl.textContent = JSON.stringify(data, null, 2);
+
+    const priceNum = data.predicted_price;
+    const priceStr = typeof priceNum === 'number' ? priceNum.toLocaleString() : priceNum;
+    const unit = data.predicted_price_unit || '';
+    
+    let pricePerM2 = '';
+    if (area > 0 && typeof priceNum === 'number') {
+      const avg = ((priceNum * 1000) / area).toFixed(1);
+      pricePerM2 = currentLang === 'vi' ? `Trung bình: ~${avg} triệu / m²` : `Average: ~${avg} Million / m²`;
+    }
+
+    resContainer.className = 'result-card';
+    resContainer.innerHTML = `
+      <div style="font-size:0.85rem; color:var(--muted); text-transform:uppercase; letter-spacing:1px;">${currentLang === 'vi' ? 'Ước tính giá thị trường' : 'Estimated Market Value'}</div>
+      <div class="price-tag">${priceStr} ${unit}</div>
+      ${pricePerM2 ? `<div style="font-size:0.85rem; color:var(--accent); font-weight:700; background:rgba(245,158,11,0.15); padding:4px 12px; border-radius:20px;">${pricePerM2}</div>` : ''}
+      <div style="margin-top:16px; font-size:0.8rem; color:var(--muted);">${currentLang === 'vi' ? 'Model AI sử dụng:' : 'AI Model used:'} <strong>${data.model_used || 'Gradient Boosting / XGBoost'}</strong></div>
+    `;
+  } catch (err) {
+    resContainer.className = 'result-card';
+    resContainer.style.borderColor = 'var(--danger)';
+    resContainer.innerHTML = `<div style="font-size:36px;">❌</div><div class="price-tag" style="font-size:1.2rem; color:var(--danger);">${currentLang === 'vi' ? 'Lỗi Kết Nối' : 'Connection Error'}</div><p style="color:var(--text); font-size:0.85rem;">Cannot connect to API at <code>${base}</code>.</p>`;
+    rawEl.textContent = 'Lỗi: ' + err.message;
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = i18n[currentLang].submitBtn;
+  }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,23 @@
+# Flutter / Dart build artifacts (regenerate with `flutter build apk`)
+**/mobile_flutter/build/
+**/mobile_flutter/.dart_tool/
+**/mobile_flutter/.flutter-plugins
+**/mobile_flutter/.flutter-plugins-dependencies
+**/mobile_flutter/.plugin_symlinks/
+**/mobile_flutter/android/.gradle/
+**/mobile_flutter/android/local.properties
+
+# Built APKs (large binaries; distribute separately, not via git)
+mobile_apks/*.apk
+
+# Python
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+
+# Report build scratch
+report/images/_placeholders/

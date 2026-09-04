@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="theme-color" content="#0f172a" />
+<link rel="manifest" href="manifest.json" />
+<title>Recommend Check — Mobile</title>
+<style>
+  :root { --bg:#0f172a; --card:#1e293b; --accent:#a78bfa; --text:#e2e8f0; --muted:#94a3b8; --danger:#f87171; --safe:#34d399; }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family: -apple-system, Segoe UI, Roboto, sans-serif; background:var(--bg); color:var(--text); padding:16px; }
+  h1 { font-size: 1.2rem; margin-bottom: 2px; }
+  h2 { font-size: 1rem; margin: 20px 0 6px; color: var(--muted); }
+  .sub { color: var(--muted); margin-top:0; margin-bottom: 14px; font-size: .8rem; }
+  .card { background: var(--card); border-radius: 14px; padding: 16px; margin-bottom: 14px; }
+  label { display:block; font-size:.78rem; color:var(--muted); margin: 10px 0 4px; }
+  input, select, textarea { width:100%; padding:11px 10px; border-radius:8px; border:1px solid #334155; background:#0f172a; color:var(--text); font-size:1rem; font-family: inherit; }
+  textarea { min-height: 80px; resize: vertical; }
+  button { width:100%; margin-top:18px; padding:15px; border:none; border-radius:10px; background:var(--accent); color:#1e1330; font-weight:700; font-size:1rem; }
+  #result, #textResult { text-align:center; font-size:1.05rem; font-weight:700; margin-top:10px; min-height:1.4em; }
+  #result.rec, #textResult.rec { color: var(--safe); }
+  #result.notrec, #textResult.notrec { color: var(--danger); }
+  #apiRow { font-size:.72rem; color:var(--muted); margin-bottom:10px; }
+  #apiRow input { font-size:.72rem; padding:6px; }
+</style>
+</head>
+<body>
+
+<h1>🛍️ Recommend Check</h1>
+<p class="sub">Mobile client — sends review data to the prediction API and shows the result.</p>
+
+<div id="apiRow">
+  API: <input id="apiUrl" value="http://localhost:8002" />
+</div>
+
+<div class="card">
+  <h2>Structured review</h2>
+  <label>Customer age</label>
+  <input id="Age" type="number" value="35" />
+
+  <label>Rating (1–5)</label>
+  <input id="Rating" type="number" min="1" max="5" value="5" />
+
+  <label>Positive feedback count</label>
+  <input id="PositiveFeedbackCount" type="number" value="2" />
+
+  <label>Review title</label>
+  <input id="Title" value="Great fit" />
+
+  <label>Review text</label>
+  <textarea id="ReviewText">Absolutely love this dress, fits perfectly!</textarea>
+
+  <label>Division</label>
+  <select id="DivisionName"><option>General</option><option>General Petite</option><option>Initmates</option></select>
+
+  <label>Department</label>
+  <select id="DepartmentName">
+    <option>Dresses</option><option>Tops</option><option>Bottoms</option><option>Intimate</option><option>Jackets</option><option>Trend</option>
+  </select>
+
+  <label>Product class</label>
+  <select id="ClassName">
+    <option>Dresses</option><option>Knits</option><option>Blouses</option><option>Sweaters</option><option>Pants</option>
+    <option>Jeans</option><option>Fine gauge</option><option>Skirts</option><option>Jackets</option><option>Lounge</option>
+    <option>Swim</option><option>Outerwear</option><option>Shorts</option><option>Sleep</option><option>Legwear</option>
+    <option>Intimates</option><option>Layering</option><option>Trend</option><option>Casual bottoms</option><option>Chemises</option>
+  </select>
+
+  <button id="btn">Predict</button>
+  <div id="result"></div>
+</div>
+
+<div class="card">
+  <h2>Analyze free-text review</h2>
+  <textarea id="freeText">This runs small and the fabric feels cheap.</textarea>
+  <button id="analyzeBtn">Analyze with AI</button>
+  <div id="textResult"></div>
+</div>
+
+<script>
+document.getElementById("btn").addEventListener("click", async () => {
+  const base = document.getElementById("apiUrl").value.replace(/\/$/, "");
+  const resultEl = document.getElementById("result");
+  resultEl.className = ""; resultEl.textContent = "Calling API...";
+
+  const payload = {
+    "Age": parseFloat(document.getElementById("Age").value),
+    "Rating": parseInt(document.getElementById("Rating").value),
+    "Positive Feedback Count": parseInt(document.getElementById("PositiveFeedbackCount").value),
+    "Review Text": document.getElementById("ReviewText").value,
+    "Title": document.getElementById("Title").value,
+    "Division Name": document.getElementById("DivisionName").value,
+    "Department Name": document.getElementById("DepartmentName").value,
+    "Class Name": document.getElementById("ClassName").value,
+  };
+
+  try {
+    const res = await fetch(base + "/predict", {
+      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload),
+    });
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const data = await res.json();
+    resultEl.textContent = data.prediction + " (" + (data.probability_recommended*100).toFixed(1) + "%)";
+    resultEl.className = data.prediction_label === 1 ? "rec" : "notrec";
+  } catch (err) {
+    resultEl.textContent = "Error: " + err.message;
+    resultEl.className = "notrec";
+  }
+});
+
+document.getElementById("analyzeBtn").addEventListener("click", async () => {
+  const base = document.getElementById("apiUrl").value.replace(/\/$/, "");
+  const resultEl = document.getElementById("textResult");
+  resultEl.className = ""; resultEl.textContent = "Calling API...";
+  try {
+    const res = await fetch(base + "/analyze_text", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text: document.getElementById("freeText").value }),
+    });
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const data = await res.json();
+    resultEl.textContent = data.prediction + " (" + (data.probability_recommended*100).toFixed(1) + "%)";
+    resultEl.className = data.prediction === "Recommended" ? "rec" : "notrec";
+  } catch (err) {
+    resultEl.textContent = "Error: " + err.message;
+    resultEl.className = "notrec";
+  }
+});
+</script>
+</body>
+</html>

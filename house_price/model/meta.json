@@ -1,0 +1,138 @@
+{
+  "app": "house_price",
+  "best_model_name": "Gradient Boosting",
+  "feature_cols": [
+    "Area",
+    "Frontage",
+    "Access Road",
+    "Floors",
+    "Bedrooms",
+    "Bathrooms",
+    "Legal status",
+    "Furniture state",
+    "House direction",
+    "Balcony direction",
+    "ProvinceGroup"
+  ],
+  "numeric_cols": [
+    "Area",
+    "Frontage",
+    "Access Road",
+    "Floors",
+    "Bedrooms",
+    "Bathrooms"
+  ],
+  "categorical_cols": [
+    "Legal status",
+    "Furniture state",
+    "House direction",
+    "Balcony direction",
+    "ProvinceGroup"
+  ],
+  "categorical_options": {
+    "Legal status": [
+      "Have certificate",
+      "Sale contract",
+      "Unknown"
+    ],
+    "Furniture state": [
+      "Basic",
+      "Full",
+      "Unknown"
+    ],
+    "House direction": [
+      "Bắc",
+      "Nam",
+      "Tây",
+      "Tây - Bắc",
+      "Tây - Nam",
+      "Unknown",
+      "Đông",
+      "Đông - Bắc",
+      "Đông - Nam"
+    ],
+    "Balcony direction": [
+      "Bắc",
+      "Nam",
+      "Tây",
+      "Tây - Bắc",
+      "Tây - Nam",
+      "Unknown",
+      "Đông",
+      "Đông - Bắc",
+      "Đông - Nam"
+    ],
+    "ProvinceGroup": [
+      "Bà Rịa Vũng Tàu",
+      "Bình Dương",
+      "Bình Thuận",
+      "Bắc Ninh",
+      "Hà Nội",
+      "Hưng Yên",
+      "Hải Phòng",
+      "Hồ Chí Minh",
+      "Khac",
+      "Khánh Hòa",
+      "Long An",
+      "Đà Nẵng",
+      "Đồng Nai"
+    ]
+  },
+  "target_col": "Price",
+  "target_unit": "billion VND",
+  "test_metrics": {
+    "MAE": 1.2478644137059527,
+    "MSE": 2.5274382910619733,
+    "RMSE": 1.589791901810414,
+    "R2": 0.47200530995035395
+  },
+  "validation_comparison": [
+    {
+      "Model": "Linear Regression",
+      "MAE": 1.4794253597788682,
+      "MSE": 3.388421176951367,
+      "RMSE": 1.840766464533556,
+      "R2": 0.3169400434838543,
+      "Training Time (s)": 0.030390501022338867
+    },
+    {
+      "Model": "Ridge",
+      "MAE": 1.4794852763526762,
+      "MSE": 3.3883874562216176,
+      "RMSE": 1.8407573050844095,
+      "R2": 0.3169468411276517,
+      "Training Time (s)": 0.014889717102050781
+    },
+    {
+      "Model": "Decision Tree",
+      "MAE": 1.3708554550610679,
+      "MSE": 3.023929493755254,
+      "RMSE": 1.7389449369532244,
+      "R2": 0.3904166452026634,
+      "Training Time (s)": 0.06921958923339844
+    },
+    {
+      "Model": "Random Forest",
+      "MAE": 1.2642319244158482,
+      "MSE": 2.746907847083511,
+      "RMSE": 1.6573798137673545,
+      "R2": 0.446260468637824,
+      "Training Time (s)": 2.058769702911377
+    },
+    {
+      "Model": "Gradient Boosting",
+      "MAE": 1.2825465747033922,
+      "MSE": 2.636744999275786,
+      "RMSE": 1.6238057147564748,
+      "R2": 0.46846781126249204,
+      "Training Time (s)": 5.843434810638428
+    }
+  ],
+  "baseline_metrics": {
+    "MAE": 1.873490452727262,
+    "MSE": 4.960890050053587,
+    "RMSE": 2.2273055583043804,
+    "R2": -4.8448794008448814e-05
+  },
+  "random_seed": 42
+}

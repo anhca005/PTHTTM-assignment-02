@@ -1,0 +1,127 @@
+﻿python : C:\Users\ADMIN\AppData\Roaming\Python\Python314\site-packages\sklearn\svm\_base.py:239: FutureWarning: The 
+`probability` parameter was deprecated in 1.9 and will be removed in version 1.11. Use `CalibratedClassifierCV(SVC(), 
+ensemble=False)` instead of `SVC(probability=True)`
+At line:1 char:349
++ ... \HOCTAP\PTHTTM\A02\ecommerce\notebook" ; python train.py 2>&1 | Tee-O ...
++                                              ~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (C:\Users\ADMIN\...bability=True)`:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+  warnings.warn(
+C:\Users\ADMIN\AppData\Roaming\Python\Python314\site-packages\sklearn\svm\_base.py:239: FutureWarning: The 
+`probability` parameter was deprecated in 1.9 and will be removed in version 1.11. Use `CalibratedClassifierCV(SVC(), 
+ensemble=False)` instead of `SVC(probability=True)`
+  warnings.warn(
+======================================================================
+STEP 1-2: RAW DATA & UNDERSTANDING
+======================================================================
+Dataset shape: (23486, 10)
+   Clothing ID  Age                    Title                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           Review Text  Rating  Recommended IND  Positive Feedback Count Division Name Department Name Class Name
+0          767   33                      NaN                                                                                                                                                                                                                                                                                                                                                                                                                                                                 Absolutely wonderful - silky and sexy and comfortable       4                1                        0     Initmates        Intimate  Intimates
+1         1080   34                      NaN                                                                                                                                                                                                       Love this dress!  it's sooo pretty.  i happened to find it in a store, and i'm glad i did bc i never would have ordered it online bc it's petite.  i bought a petite and am 5'8".  i love the length on me- hits just a little below the knee.  would definitely be a true midi on someone who is truly petite.       5                1                        4       General         Dresses    Dresses
+2         1077   60  Some major design flaws  I had such high hopes for this dress and really wanted it to work for me. i initially ordered the petite small (my usual size) but i found this to be outrageously small. so small in fact that i could not zip it up! i reordered it in petite medium, which was just ok. overall, the top half was comfortable and fit nicely, but the bottom half had a very tight under layer and several somewhat cheap (net) over layers. imo, a major design flaw was the net over layer sewn directly into the zipper - it c       3                0                        0       General         Dresses    Dresses
+
+Dtypes:
+Clothing ID                int64
+Age                        int64
+Title                        str
+Review Text                  str
+Rating                     int64
+Recommended IND            int64
+Positive Feedback Count    int64
+Division Name                str
+Department Name              str
+Class Name                   str
+dtype: object
+
+Missing values per column:
+Clothing ID                   0
+Age                           0
+Title                      3810
+Review Text                 845
+Rating                        0
+Recommended IND               0
+Positive Feedback Count       0
+Division Name                14
+Department Name              14
+Class Name                   14
+dtype: int64
+
+Duplicated rows: 21
+
+Target distribution:
+Recommended IND
+1    19314
+0     4172
+Name: count, dtype: int64
+
+======================================================================
+STEP 3: DATA CLEANING
+======================================================================
+Removed 21 exact duplicate rows.
+Invalid value counts: {'Age <= 0': np.int64(0), 'Rating outside 1-5': np.int64(0), 'Recommended IND not 0/1': np.int64(0), 'Positive Feedback Count < 0': np.int64(0)}
+
+Outlier summary (IQR method):
+  Age: bounds=(7.00, 79.00) outliers=109
+  Positive Feedback Count: bounds=(-4.50, 7.50) outliers=2147
+
+Dropped 14 rows with missing product-category info.
+
+Cleaned dataset shape: (23451, 14)
+
+======================================================================
+STEP 4: DATA REPRESENTATION
+======================================================================
+X shape (raw feature matrix, tabular part): (23451, 10)
+y shape (target vector): (23451,)
+Numeric features: ['Age', 'Rating', 'Positive Feedback Count', 'Review Length', 'Title Length', 'Has Review', 'Has Title']
+Categorical features: ['Division Name', 'Department Name', 'Class Name']
+
+======================================================================
+STEP 5: EXPLORATORY DATA ANALYSIS
+======================================================================
+Saved 5 EDA charts to D:\HOCTAP\PTHTTM\A02\ecommerce\charts
+
+======================================================================
+STEP 6: TRAIN / VALIDATION / TEST SPLIT (70/15/15, stratified)
+======================================================================
+Train: (16415, 10)  Validation: (3518, 10)  Test: (3518, 10)
+Processed train shape: (16415, 35)
+Processed val shape:   (3518, 35)
+Processed test shape:  (3518, 35)
+
+======================================================================
+STEP 7: BASELINE AND MODEL TRAINING
+======================================================================
+Baseline (majority class) validation metrics: {'Accuracy': 0.8220579874928937, 'Precision': 0.8220579874928937, 'Recall': 1.0, 'F1': 0.9023400936037441}
+Logistic Regression: F1=0.9528  Acc=0.9238  (0.05s)
+Decision Tree: F1=0.9486  Acc=0.9176  (0.05s)
+Random Forest: F1=0.9497  Acc=0.9181  (0.69s)
+KNN: F1=0.9485  Acc=0.9142  (0.00s)
+SVM: F1=0.9528  Acc=0.9247  (18.16s)
+
+TF-IDF training shape: (16415, 5000)
+Text Logistic Regression (TF-IDF): F1=0.9288  Acc=0.8778
+
+Validation comparison (sorted by F1, 6 models):
+                                   Accuracy  Precision    Recall        F1   ROC-AUC  Training Time (s)
+Model                                                                                                  
+SVM                                0.924673   0.982018  0.925311  0.952822  0.965269          18.156732
+Logistic Regression                0.923820   0.971942  0.934302  0.952750  0.966616           0.049839
+Random Forest                      0.918135   0.959421  0.940180  0.949703  0.956752           0.688087
+Decision Tree                      0.917567   0.973091  0.925311  0.948600  0.947642           0.048463
+KNN                                0.914156   0.935440  0.961964  0.948517  0.954833           0.002973
+Text Logistic Regression (TF-IDF)  0.877771   0.890794  0.970263  0.928832  0.916810           0.118490
+
+Best deployable (tabular) model on validation (highest F1): SVM
+Test metrics: {'Accuracy': 0.9383172256964184, 'Precision': 0.9886737303617099, 'Recall': 0.9356846473029046, 'F1': 0.9614496358145319, 'ROC-AUC': 0.9777561986575284}
+
+Error analysis (test set): TP=2706 TN=595 FP=31 FN=186
+  Total: 3518  Correct: 3301  Incorrect: 217
+
+======================================================================
+STEP 8: PERSISTING MODEL
+======================================================================
+Saved model_pipeline.joblib, text_model_pipeline.joblib and meta.json to D:\HOCTAP\PTHTTM\A02\ecommerce\model
+
+DONE.

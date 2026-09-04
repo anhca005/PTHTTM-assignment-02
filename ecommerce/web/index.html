@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>🛍️ E-Commerce Product Recommendation AI — Web Client</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-dark: #0F172A;
+    --card-bg: rgba(30, 41, 59, 0.7);
+    --card-border: rgba(51, 65, 85, 0.6);
+    --primary: #8B5CF6;
+    --primary-hover: #7C3AED;
+    --accent: #EC4899;
+    --text: #F8FAFC;
+    --muted: #94A3B8;
+    --danger: #EF4444;
+    --danger-bg: rgba(239, 68, 68, 0.12);
+    --safe: #10B981;
+    --safe-bg: rgba(16, 185, 129, 0.12);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+    background: var(--bg-dark);
+    background-image: 
+      radial-gradient(at 10% 10%, rgba(139, 92, 246, 0.1) 0px, transparent 50%),
+      radial-gradient(at 90% 90%, rgba(236, 72, 153, 0.08) 0px, transparent 50%);
+    background-attachment: fixed;
+    color: var(--text);
+    padding: 32px 16px;
+    min-height: 100vh;
+  }
+  .container { max-width: 1080px; margin: 0 auto; }
+  
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--card-border);
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .brand { display: flex; align-items: center; gap: 14px; }
+  .brand-icon {
+    width: 46px; height: 46px;
+    background: rgba(139, 92, 246, 0.15);
+    border: 1px solid rgba(139, 92, 246, 0.3);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px;
+  }
+  h1 { font-size: 1.5rem; margin: 0; font-weight: 800; }
+  .subtitle { font-size: 0.85rem; color: var(--muted); margin-top: 2px; }
+
+  .lang-btn {
+    background: rgba(30, 41, 59, 0.8);
+    border: 1px solid var(--card-border);
+    color: var(--text);
+    padding: 8px 14px;
+    border-radius: 10px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+  }
+  .lang-btn:hover { background: var(--primary); color: #FFF; border-color: var(--primary); }
+
+  .server-bar {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    backdrop-filter: blur(12px);
+    border-radius: 14px;
+    padding: 14px 20px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .server-bar label { font-size: 0.85rem; font-weight: 600; color: var(--primary); white-space: nowrap; }
+  .server-bar input {
+    flex: 1;
+    background: #0F172A;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    padding: 8px 14px;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 0.9rem;
+  }
+
+  .grid { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 24px; }
+  @media (max-width: 860px) { .grid { grid-template-columns: 1fr; } }
+  
+  .card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    backdrop-filter: blur(12px);
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
+    margin-bottom: 24px;
+  }
+  .section-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin-top: 0;
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: var(--primary);
+  }
+  
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+
+  .form-group { margin-bottom: 16px; }
+  .form-group label {
+    display: block;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  .form-control {
+    width: 100%;
+    padding: 11px 14px;
+    border-radius: 10px;
+    border: 1px solid #334155;
+    background: #0F172A;
+    color: var(--text);
+    font-size: 0.95rem;
+    font-family: inherit;
+    transition: all 0.2s;
+  }
+  .form-control:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
+  }
+  textarea.form-control { min-height: 80px; resize: vertical; }
+
+  /* Rating Stars */
+  .star-rating {
+    display: flex;
+    gap: 8px;
+    font-size: 28px;
+    cursor: pointer;
+  }
+  .star-rating span { transition: transform 0.15s; }
+  .star-rating span:hover { transform: scale(1.2); }
+  
+  .preset-btn {
+    padding: 4px 10px;
+    border-radius: 20px;
+    border: 1px solid #334155;
+    background: #0F172A;
+    color: var(--muted);
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .preset-btn:hover { background: var(--primary); color: #FFF; border-color: var(--primary); }
+
+  .submit-btn {
+    width: 100%;
+    padding: 14px;
+    margin-top: 10px;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    color: #FFF;
+    font-weight: 800;
+    font-size: 1rem;
+    cursor: pointer;
+    box-shadow: 0 6px 20px rgba(139, 92, 246, 0.3);
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .submit-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(139, 92, 246, 0.4); }
+  .submit-btn:active { transform: translateY(1px); }
+  
+  .result-card {
+    min-height: 220px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    border-radius: 14px;
+    padding: 24px;
+    transition: all 0.3s;
+  }
+  .result-card.placeholder { background: rgba(15, 23, 42, 0.5); border: 2px dashed #334155; }
+  .result-card.rec { background: var(--safe-bg); border: 1.5px solid var(--safe); }
+  .result-card.notrec { background: var(--danger-bg); border: 1.5px solid var(--danger); }
+  
+  .result-title { font-size: 1.6rem; font-weight: 800; margin: 10px 0 4px; }
+  .result-card.rec .result-title { color: var(--safe); }
+  .result-card.notrec .result-title { color: var(--danger); }
+
+  pre {
+    background: #0F172A;
+    border: 1px solid #334155;
+    padding: 12px;
+    border-radius: 10px;
+    overflow-x: auto;
+    font-size: 0.78rem;
+    color: var(--primary);
+    max-height: 180px;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <div class="brand">
+      <div class="brand-icon">🛍️</div>
+      <div>
+        <h1>E-Commerce Product Recommendation AI</h1>
+        <div class="subtitle" id="i18n-sub">Dự đoán Đề xuất Sản phẩm & Phân tích Đánh giá NLP — Web Client (FastAPI)</div>
+      </div>
+    </div>
+
+    <!-- Language Selector Button -->
+    <button class="lang-btn" id="langBtn" onclick="toggleLang()">
+      <span id="langFlag">🌐</span> <span id="langText">EN</span>
+    </button>
+  </header>
+
+  <div class="server-bar">
+    <label id="i18n-server-lbl">🌐 API Base URL:</label>
+    <input id="apiUrl" value="http://localhost:8002" placeholder="http://localhost:8002" />
+  </div>
+
+  <div class="grid">
+    <!-- Form Side -->
+    <div>
+      <!-- Section 1 Card -->
+      <div class="card">
+        <div class="section-title">
+          <span id="i18n-sec1">🛍️ 1. Đánh giá Cấu trúc (Tabular Model)</span>
+          <div>
+            <button type="button" class="preset-btn" id="i18n-preset-good" onclick="fillTabularPreset('good')">Mẫu 5⭐ Tốt</button>
+            <button type="button" class="preset-btn" id="i18n-preset-bad" onclick="fillTabularPreset('bad')">Mẫu 1⭐ Tệ</button>
+          </div>
+        </div>
+        
+        <form id="tabularForm">
+          <div class="form-group">
+            <label id="i18n-lbl-rating">Đánh giá số sao (Rating 1-5)</label>
+            <div class="star-rating" id="starRating">
+              <span onclick="setRating(1)">⭐</span>
+              <span onclick="setRating(2)">⭐</span>
+              <span onclick="setRating(3)">⭐</span>
+              <span onclick="setRating(4)">⭐</span>
+              <span onclick="setRating(5)">⭐</span>
+            </div>
+            <input type="hidden" id="Rating" value="5">
+          </div>
+
+          <div class="grid2">
+            <div class="form-group">
+              <label for="Age" id="i18n-lbl-age">Tuổi khách hàng</label>
+              <input type="number" id="Age" class="form-control" value="35" required>
+            </div>
+            <div class="form-group">
+              <label for="PositiveFeedbackCount" id="i18n-lbl-feedback">Lượt thích (Feedback)</label>
+              <input type="number" id="PositiveFeedbackCount" class="form-control" value="2" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="Title" id="i18n-lbl-title">Tiêu đề đánh giá</label>
+            <input type="text" id="Title" class="form-control" value="Great fit">
+          </div>
+
+          <div class="form-group">
+            <label for="ReviewText" id="i18n-lbl-review">Nội dung đánh giá</label>
+            <textarea id="ReviewText" class="form-control">Absolutely love this dress, fits perfectly and so comfortable!</textarea>
+          </div>
+
+          <div class="grid3">
+            <div class="form-group">
+              <label for="DivisionName">Division</label>
+              <select id="DivisionName" class="form-control">
+                <option value="General">General</option>
+                <option value="General Petite">General Petite</option>
+                <option value="Initmates">Initmates</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="DepartmentName">Department</label>
+              <select id="DepartmentName" class="form-control">
+                <option value="Dresses">Dresses</option>
+                <option value="Tops">Tops</option>
+                <option value="Bottoms">Bottoms</option>
+                <option value="Intimate">Intimate</option>
+                <option value="Jackets">Jackets</option>
+                <option value="Trend">Trend</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="ClassName">Product Class</label>
+              <select id="ClassName" class="form-control">
+                <option value="Dresses">Dresses</option>
+                <option value="Knits">Knits</option>
+                <option value="Blouses">Blouses</option>
+                <option value="Sweaters">Sweaters</option>
+                <option value="Pants">Pants</option>
+                <option value="Jeans">Jeans</option>
+                <option value="Fine gauge">Fine gauge</option>
+                <option value="Skirts">Skirts</option>
+                <option value="Jackets">Jackets</option>
+                <option value="Lounge">Lounge</option>
+                <option value="Swim">Swim</option>
+                <option value="Outerwear">Outerwear</option>
+                <option value="Shorts">Shorts</option>
+                <option value="Sleep">Sleep</option>
+                <option value="Legwear">Legwear</option>
+                <option value="Intimates">Intimates</option>
+                <option value="Layering">Layering</option>
+                <option value="Trend">Trend</option>
+                <option value="Casual bottoms">Casual bottoms</option>
+                <option value="Chemises">Chemises</option>
+              </select>
+            </div>
+          </div>
+
+          <button type="submit" class="submit-btn" id="submitTabularBtn">
+            ✨ Dự Đoán Khả Năng Đề Xuất
+          </button>
+        </form>
+      </div>
+
+      <!-- Section 2 Card -->
+      <div class="card">
+        <div class="section-title">
+          <span id="i18n-sec2">🤖 2. Phân tích Văn bản Tự do (NLP Model)</span>
+          <div>
+            <button type="button" class="preset-btn" id="i18n-preset-pos" onclick="fillTextPreset('pos')">Mẫu Tích cực</button>
+            <button type="button" class="preset-btn" id="i18n-preset-neg" onclick="fillTextPreset('neg')">Mẫu Tiêu cực</button>
+          </div>
+        </div>
+
+        <form id="textForm">
+          <div class="form-group">
+            <label for="freeText" id="i18n-lbl-freetext">Đoạn nhận xét tự do của khách hàng</label>
+            <textarea id="freeText" class="form-control">This runs small and the fabric feels cheap, I would not buy again.</textarea>
+          </div>
+          <button type="submit" class="submit-btn" style="background: linear-gradient(135deg, #EC4899, #8B5CF6);" id="submitTextBtn">
+            🧠 Phân Tích Cảm Xúc AI
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Output Side -->
+    <div>
+      <div class="card" style="position: sticky; top: 24px;">
+        <div class="section-title"><span id="i18n-sec-res">📋 Kết quả Phân tích AI</span></div>
+        
+        <h4 style="margin-top:0; font-size:0.9rem; color:var(--accent);" id="i18n-res-title1">1. Mô hình Đánh giá Cấu trúc:</h4>
+        <div id="tabularResult" class="result-card placeholder">
+          <p style="color:var(--muted); margin:0;" id="i18n-placeholder1">Bấm nút <strong>Dự Đoán Khả Năng Đề Xuất</strong> để xem kết quả.</p>
+        </div>
+
+        <h4 style="margin-top:20px; font-size:0.9rem; color:var(--accent);" id="i18n-res-title2">2. Mô hình Phân tích Văn bản (NLP):</h4>
+        <div id="textResult" class="result-card placeholder">
+          <p style="color:var(--muted); margin:0;" id="i18n-placeholder2">Bấm nút <strong>Phân Tích Cảm Xúc AI</strong> để xem kết quả.</p>
+        </div>
+
+        <h4 style="margin-top:24px; margin-bottom:8px; font-size:0.85rem; color:var(--muted);">Raw JSON Response:</h4>
+        <pre id="rawResponse">—</pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let currentLang = 'vi';
+
+const i18n = {
+  vi: {
+    sub: "Dự đoán Đề xuất Sản phẩm & Phân tích Đánh giá NLP — Web Client (FastAPI)",
+    serverLbl: "🌐 API Base URL:",
+    sec1: "🛍️ 1. Đánh giá Cấu trúc (Tabular Model)",
+    presetGood: "Mẫu 5⭐ Tốt", presetBad: "Mẫu 1⭐ Tệ",
+    rating: "Đánh giá số sao (Rating 1-5)",
+    age: "Tuổi khách hàng", feedback: "Lượt thích (Feedback)",
+    title: "Tiêu đề đánh giá", review: "Nội dung đánh giá",
+    submitTabularBtn: "✨ Dự Đoán Khả Năng Đề Xuất",
+    sec2: "🤖 2. Phân tích Văn bản Tự do (NLP Model)",
+    presetPos: "Mẫu Tích cực", presetNeg: "Mẫu Tiêu cực",
+    freeText: "Đoạn nhận xét tự do của khách hàng",
+    submitTextBtn: "🧠 Phân Tích Cảm Xúc AI",
+    secRes: "📋 Kết quả Phân tích AI",
+    resTitle1: "1. Mô hình Đánh giá Cấu trúc:",
+    placeholder1: "Bấm nút <strong>Dự Đoán Khả Năng Đề Xuất</strong> để xem kết quả.",
+    resTitle2: "2. Mô hình Phân tích Văn bản (NLP):",
+    placeholder2: "Bấm nút <strong>Phân Tích Cảm Xúc AI</strong> để xem kết quả."
+  },
+  en: {
+    sub: "E-Commerce Recommendation & NLP Sentiment AI — Web Client (FastAPI)",
+    serverLbl: "🌐 API Base URL:",
+    sec1: "🛍️ 1. Structured Review (Tabular Model)",
+    presetGood: "Preset 5⭐ Good", presetBad: "Preset 1⭐ Bad",
+    rating: "Star Rating (1-5 Stars)",
+    age: "Customer Age", feedback: "Positive Feedback Count",
+    title: "Review Title", review: "Review Text",
+    submitTabularBtn: "✨ Predict Recommendation",
+    sec2: "🤖 2. Free Text Review (NLP Model)",
+    presetPos: "Positive Sample", presetNeg: "Negative Sample",
+    freeText: "Free text customer review",
+    submitTextBtn: "🧠 Analyze Sentiment with AI",
+    secRes: "📋 AI Analysis Results",
+    resTitle1: "1. Tabular Model Result:",
+    placeholder1: "Click <strong>Predict Recommendation</strong> to view results.",
+    resTitle2: "2. NLP Text Model Result:",
+    placeholder2: "Click <strong>Analyze Sentiment with AI</strong> to view results."
+  }
+};
+
+function toggleLang() {
+  currentLang = currentLang === 'vi' ? 'en' : 'vi';
+  document.getElementById('langText').textContent = currentLang === 'vi' ? 'EN' : 'VI';
+  applyTranslations();
+}
+
+function applyTranslations() {
+  const t = i18n[currentLang];
+  document.getElementById('i18n-sub').textContent = t.sub;
+  document.getElementById('i18n-server-lbl').textContent = t.serverLbl;
+  document.getElementById('i18n-sec1').textContent = t.sec1;
+  document.getElementById('i18n-preset-good').textContent = t.presetGood;
+  document.getElementById('i18n-preset-bad').textContent = t.presetBad;
+  document.getElementById('i18n-lbl-rating').textContent = t.rating;
+  document.getElementById('i18n-lbl-age').textContent = t.age;
+  document.getElementById('i18n-lbl-feedback').textContent = t.feedback;
+  document.getElementById('i18n-lbl-title').textContent = t.title;
+  document.getElementById('i18n-lbl-review').textContent = t.review;
+  document.getElementById('submitTabularBtn').innerHTML = t.submitTabularBtn;
+  document.getElementById('i18n-sec2').textContent = t.sec2;
+  document.getElementById('i18n-preset-pos').textContent = t.presetPos;
+  document.getElementById('i18n-preset-neg').textContent = t.presetNeg;
+  document.getElementById('i18n-lbl-freetext').textContent = t.freeText;
+  document.getElementById('submitTextBtn').innerHTML = t.submitTextBtn;
+  document.getElementById('i18n-sec-res').textContent = t.secRes;
+  document.getElementById('i18n-res-title1').textContent = t.resTitle1;
+  document.getElementById('i18n-res-title2').textContent = t.resTitle2;
+
+  const ph1 = document.getElementById('i18n-placeholder1');
+  if (ph1) ph1.innerHTML = t.placeholder1;
+  const ph2 = document.getElementById('i18n-placeholder2');
+  if (ph2) ph2.innerHTML = t.placeholder2;
+}
+
+let currentRating = 5;
+
+function setRating(val) {
+  currentRating = val;
+  document.getElementById('Rating').value = val;
+  const stars = document.querySelectorAll('#starRating span');
+  stars.forEach((star, idx) => {
+    star.style.opacity = (idx < val) ? '1' : '0.3';
+  });
+}
+setRating(5);
+
+function fillTabularPreset(type) {
+  if (type === 'good') {
+    setRating(5);
+    document.getElementById('Title').value = currentLang === 'vi' ? 'Mặc rất vừa vặn!' : 'Great fit & quality!';
+    document.getElementById('ReviewText').value = currentLang === 'vi' 
+      ? 'Tuyệt đối thích chiếc váy này, vừa vặn hoàn hảo và chất liệu vô cùng thoải mái!' 
+      : 'Absolutely love this dress, fits perfectly and so comfortable!';
+  } else {
+    setRating(1);
+    document.getElementById('Title').value = currentLang === 'vi' ? 'Rất thất vọng' : 'Very Disappointed';
+    document.getElementById('ReviewText').value = currentLang === 'vi' 
+      ? 'Áo bị chật, chất vải mỏng dính xấu xí, tôi sẽ không bao giờ mua lại.' 
+      : 'Runs small, cheap fabric quality. Would not buy again.';
+  }
+}
+
+function fillTextPreset(type) {
+  if (type === 'pos') {
+    document.getElementById('freeText').value = currentLang === 'vi' 
+      ? 'Sản phẩm chất lượng vượt mong đợi, giao hàng nhanh và đóng gói rất cẩn thận!' 
+      : 'Exceeded expectations! High quality fabric, fast delivery and beautiful packaging!';
+  } else {
+    document.getElementById('freeText').value = currentLang === 'vi' 
+      ? 'Kích thước nhỏ hơn bảng size khá nhiều, chất liệu tổng hợp nóng và dễ rách.' 
+      : 'This runs small and the fabric feels cheap, I would not buy again.';
+  }
+}
+
+// Tabular Submit
+document.getElementById('tabularForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const base = document.getElementById('apiUrl').value.trim().replace(/\/+$/, '');
+  const submitBtn = document.getElementById('submitTabularBtn');
+  const resContainer = document.getElementById('tabularResult');
+  const rawEl = document.getElementById('rawResponse');
+
+  const payload = {
+    "Age": parseFloat(document.getElementById('Age').value) || 0,
+    "Rating": parseInt(document.getElementById('Rating').value) || 5,
+    "Positive Feedback Count": parseInt(document.getElementById('PositiveFeedbackCount').value) || 0,
+    "Review Text": document.getElementById('ReviewText').value,
+    "Title": document.getElementById('Title').value,
+    "Division Name": document.getElementById('DivisionName').value,
+    "Department Name": document.getElementById('DepartmentName').value,
+    "Class Name": document.getElementById('ClassName').value
+  };
+
+  submitBtn.disabled = true;
+  resContainer.className = 'result-card placeholder';
+  resContainer.innerHTML = '<p style="color:var(--primary)">Calling AI Model...</p>';
+
+  try {
+    const res = await fetch(base + '/predict', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    if (!res.ok) throw new Error('HTTP status ' + res.status);
+    const data = await res.json();
+    rawEl.textContent = JSON.stringify(data, null, 2);
+
+    const isRec = data.prediction_label === 1;
+    const probPct = (data.probability_recommended * 100).toFixed(1);
+    const labelStr = currentLang === 'vi' ? (isRec ? 'Khuyên dùng' : 'Không khuyên dùng') : data.prediction;
+
+    resContainer.className = `result-card ${isRec ? 'rec' : 'notrec'}`;
+    resContainer.innerHTML = `
+      <div style="font-size: 40px;">${isRec ? '👍' : '👎'}</div>
+      <div class="result-title">${labelStr}</div>
+      <div style="font-size: 0.9rem; font-weight:700;">${currentLang === 'vi' ? 'Xác suất Đề xuất:' : 'Recommendation Prob:'} ${probPct}%</div>
+    `;
+  } catch (err) {
+    resContainer.className = 'result-card notrec';
+    resContainer.innerHTML = `<div class="result-title" style="font-size:1.1rem;">${currentLang === 'vi' ? 'Lỗi Kết Nối' : 'Connection Error'}</div><p style="color:var(--text); font-size:0.8rem;">Cannot connect to <code>${base}/predict</code></p>`;
+    rawEl.textContent = 'Lỗi: ' + err.message;
+  } finally {
+    submitBtn.disabled = false;
+  }
+});
+
+// Text Submit
+document.getElementById('textForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const base = document.getElementById('apiUrl').value.trim().replace(/\/+$/, '');
+  const submitBtn = document.getElementById('submitTextBtn');
+  const resContainer = document.getElementById('textResult');
+  const rawEl = document.getElementById('rawResponse');
+
+  const textVal = document.getElementById('freeText').value;
+
+  submitBtn.disabled = true;
+  resContainer.className = 'result-card placeholder';
+  resContainer.innerHTML = '<p style="color:var(--accent)">Calling NLP AI Model...</p>';
+
+  try {
+    const res = await fetch(base + '/analyze_text', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: textVal })
+    });
+
+    if (!res.ok) throw new Error('HTTP status ' + res.status);
+    const data = await res.json();
+    rawEl.textContent = JSON.stringify(data, null, 2);
+
+    const isRec = data.prediction === 'Recommended';
+    const probPct = (data.probability_recommended * 100).toFixed(1);
+    const labelStr = currentLang === 'vi' ? (isRec ? 'Khuyên dùng' : 'Không khuyên dùng') : data.prediction;
+
+    resContainer.className = `result-card ${isRec ? 'rec' : 'notrec'}`;
+    resContainer.innerHTML = `
+      <div style="font-size: 40px;">${isRec ? '🥰' : '😞'}</div>
+      <div class="result-title">${labelStr}</div>
+      <div style="font-size: 0.9rem; font-weight:700;">${currentLang === 'vi' ? 'Xác suất Đề xuất:' : 'Recommendation Prob:'} ${probPct}%</div>
+    `;
+  } catch (err) {
+    resContainer.className = 'result-card notrec';
+    resContainer.innerHTML = `<div class="result-title" style="font-size:1.1rem;">${currentLang === 'vi' ? 'Lỗi Kết Nối' : 'Connection Error'}</div><p style="color:var(--text); font-size:0.8rem;">Cannot connect to <code>${base}/analyze_text</code></p>`;
+    rawEl.textContent = 'Lỗi: ' + err.message;
+  } finally {
+    submitBtn.disabled = false;
+  }
+});
+</script>
+</body>
+</html>

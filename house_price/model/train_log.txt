@@ -1,0 +1,144 @@
+﻿======================================================================
+STEP 1-2: RAW DATA & UNDERSTANDING
+======================================================================
+Dataset shape: (30229, 12)
+                                                                       Address  Area  Frontage  Access Road House direction Balcony direction  Floors  Bedrooms  Bathrooms      Legal status Furniture state  Price
+0  Dự án The Empire - Vinhomes Ocean Park 2, Xã Long Hưng, Văn Giang, Hưng Yên  84.0       NaN          NaN             NaN               NaN     4.0       NaN        NaN  Have certificate             NaN    8.6
+1   Dự án The Crown - Vinhomes Ocean Park 3, Xã Nghĩa Trụ, Văn Giang, Hưng Yên  60.0       NaN          NaN             NaN               NaN     5.0       NaN        NaN               NaN             NaN    7.5
+2   Dự án The Crown - Vinhomes Ocean Park 3, Xã Nghĩa Trụ, Văn Giang, Hưng Yên  90.0       6.0         13.0      Đông - Bắc        Đông - Bắc     5.0       NaN        NaN     Sale contract             NaN    8.9
+
+Dtypes:
+Address                  str
+Area                 float64
+Frontage             float64
+Access Road          float64
+House direction          str
+Balcony direction        str
+Floors               float64
+Bedrooms             float64
+Bathrooms            float64
+Legal status             str
+Furniture state          str
+Price                float64
+dtype: object
+
+Missing values per column:
+Address                  0
+Area                     0
+Frontage             11564
+Access Road          13297
+House direction      21239
+Balcony direction    24983
+Floors                3603
+Bedrooms              5162
+Bathrooms             7074
+Legal status          4506
+Furniture state      14119
+Price                    0
+dtype: int64
+
+Duplicated rows (full): 0
+
+Describe numeric:
+               Area      Frontage   Access Road        Floors      Bedrooms     Bathrooms         Price
+count  30229.000000  18665.000000  16932.000000  26626.000000  25067.000000  23155.000000  30229.000000
+mean      68.498741      5.361692      7.853800      3.410426      3.511030      3.346837      5.872078
+std       48.069835      4.346174      7.451313      1.328897      1.309116      1.400181      2.211877
+min        3.100000      1.000000      1.000000      1.000000      1.000000      1.000000      1.000000
+25%       40.000000      4.000000      4.000000      2.000000      3.000000      2.000000      4.200000
+50%       56.000000      4.500000      6.000000      3.000000      3.000000      3.000000      5.900000
+75%       80.000000      5.000000     10.000000      4.000000      4.000000      4.000000      7.500000
+max      595.000000     77.000000     85.000000     10.000000      9.000000      9.000000     11.500000
+
+======================================================================
+STEP 3: DATA CLEANING
+======================================================================
+Removed 0 exact duplicate rows.
+Invalid value counts: {'Area <= 0': np.int64(0), 'Price <= 0': np.int64(0), 'Floors <= 0': np.int64(0), 'Bedrooms <= 0': np.int64(0), 'Bathrooms <= 0': np.int64(0)}
+
+Outlier summary (IQR method):
+  Area: bounds=(-20.00, 140.00) outliers=1636
+  Frontage: bounds=(2.50, 6.50) outliers=2305
+  Access Road: bounds=(-5.00, 19.00) outliers=1110
+  Price: bounds=(-0.75, 12.45) outliers=0
+
+ProvinceGroup distribution:
+ProvinceGroup
+Hồ Chí Minh        11778
+Hà Nội             10457
+Bình Dương          1672
+Đà Nẵng             1437
+Khac                1246
+Đồng Nai             829
+Hải Phòng            789
+Khánh Hòa            743
+Hưng Yên             405
+Long An              339
+Bà Rịa Vũng Tàu      240
+Bắc Ninh             167
+Bình Thuận           127
+Name: count, dtype: int64
+
+Cleaned dataset shape: (30229, 14)
+
+======================================================================
+STEP 4: DATA REPRESENTATION
+======================================================================
+X shape (raw feature matrix): (30229, 11)  ->  X in R^(N x d), N=30229, d=11
+y shape (target vector): (30229,)
+Numeric features: ['Area', 'Frontage', 'Access Road', 'Floors', 'Bedrooms', 'Bathrooms']
+Categorical features: ['Legal status', 'Furniture state', 'House direction', 'Balcony direction', 'ProvinceGroup']
+
+======================================================================
+STEP 5: EXPLORATORY DATA ANALYSIS
+======================================================================
+Saved 5 EDA charts to D:\HOCTAP\PTHTTM\A02\house_price\charts
+
+======================================================================
+STEP 6: TRAIN / VALIDATION / TEST SPLIT (70/15/15)
+======================================================================
+Train: (21160, 11)  Validation: (4534, 11)  Test: (4535, 11)
+Processed train shape: (21160, 43)
+Processed val shape:   (4534, 43)
+Processed test shape:  (4535, 43)
+
+======================================================================
+STEP 7: BASELINE AND MODEL TRAINING
+======================================================================
+Baseline (mean predictor) validation metrics: {'MAE': 1.873490452727262, 'MSE': 4.960890050053587, 'RMSE': np.float64(2.2273055583043804), 'R2': -4.8448794008448814e-05}
+Linear Regression: RMSE=1.8408  R2=0.3169  (0.03s)
+Ridge: RMSE=1.8408  R2=0.3169  (0.02s)
+Decision Tree: RMSE=1.7389  R2=0.3904  (0.07s)
+Random Forest: RMSE=1.6574  R2=0.4463  (2.30s)
+Gradient Boosting: RMSE=1.6238  R2=0.4685  (5.86s)
+
+Validation comparison (sorted by RMSE):
+                        MAE       MSE      RMSE        R2  Training Time (s)
+Model                                                                       
+Gradient Boosting  1.282547  2.636745  1.623806  0.468468           5.864608
+Random Forest      1.264232  2.746908  1.657380  0.446260           2.302489
+Decision Tree      1.370855  3.023929  1.738945  0.390417           0.068036
+Ridge              1.479485  3.388387  1.840757  0.316947           0.015482
+Linear Regression  1.479425  3.388421  1.840766  0.316940           0.031443
+
+Best model on validation (lowest RMSE): Gradient Boosting
+Test metrics: {'MAE': 1.2478644137059527, 'MSE': 2.5274382910619733, 'RMSE': np.float64(1.589791901810414), 'R2': 0.47200530995035395}
+
+Error analysis (test set):
+  Mean absolute error: 1.2479
+  Median absolute error: 1.0313
+  Max absolute error: 6.2529
+  5 worst predictions:
+      actual  predicted  abs_error
+4121    1.40   7.652901   6.252901
+583    10.00   3.985234   6.014766
+4175    1.05   6.948131   5.898131
+676     1.46   7.352317   5.892317
+1099    1.60   7.289263   5.689263
+
+======================================================================
+STEP 8: PERSISTING MODEL
+======================================================================
+Saved model_pipeline.joblib and meta.json to D:\HOCTAP\PTHTTM\A02\house_price\model
+
+DONE.

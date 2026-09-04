@@ -1,0 +1,151 @@
+{
+  "app": "ecommerce",
+  "best_model_name": "SVM",
+  "feature_cols": [
+    "Age",
+    "Rating",
+    "Positive Feedback Count",
+    "Review Length",
+    "Title Length",
+    "Has Review",
+    "Has Title",
+    "Division Name",
+    "Department Name",
+    "Class Name"
+  ],
+  "numeric_cols": [
+    "Age",
+    "Rating",
+    "Positive Feedback Count",
+    "Review Length",
+    "Title Length",
+    "Has Review",
+    "Has Title"
+  ],
+  "categorical_cols": [
+    "Division Name",
+    "Department Name",
+    "Class Name"
+  ],
+  "categorical_options": {
+    "Division Name": [
+      "General",
+      "General Petite",
+      "Initmates"
+    ],
+    "Department Name": [
+      "Bottoms",
+      "Dresses",
+      "Intimate",
+      "Jackets",
+      "Tops",
+      "Trend"
+    ],
+    "Class Name": [
+      "Blouses",
+      "Casual bottoms",
+      "Chemises",
+      "Dresses",
+      "Fine gauge",
+      "Intimates",
+      "Jackets",
+      "Jeans",
+      "Knits",
+      "Layering",
+      "Legwear",
+      "Lounge",
+      "Outerwear",
+      "Pants",
+      "Shorts",
+      "Skirts",
+      "Sleep",
+      "Sweaters",
+      "Swim",
+      "Trend"
+    ]
+  },
+  "target_col": "Recommended IND",
+  "class_labels": {
+    "0": "Not recommended",
+    "1": "Recommended"
+  },
+  "test_metrics": {
+    "Accuracy": 0.9383172256964184,
+    "Precision": 0.9886737303617099,
+    "Recall": 0.9356846473029046,
+    "F1": 0.9614496358145319,
+    "ROC-AUC": 0.9777561986575284
+  },
+  "validation_comparison": [
+    {
+      "Model": "SVM",
+      "Accuracy": 0.9246731097214327,
+      "Precision": 0.9820183486238532,
+      "Recall": 0.9253112033195021,
+      "F1": 0.9528217909916326,
+      "ROC-AUC": 0.965268847851736,
+      "Training Time (s)": 19.44004464149475
+    },
+    {
+      "Model": "Logistic Regression",
+      "Accuracy": 0.923820352472996,
+      "Precision": 0.9719424460431655,
+      "Recall": 0.9343015214384509,
+      "F1": 0.9527503526093088,
+      "ROC-AUC": 0.9666160698898362,
+      "Training Time (s)": 0.05364680290222168
+    },
+    {
+      "Model": "Random Forest",
+      "Accuracy": 0.9181353041500853,
+      "Precision": 0.9594213126323218,
+      "Recall": 0.940179806362379,
+      "F1": 0.949703108627314,
+      "ROC-AUC": 0.9567519078740957,
+      "Training Time (s)": 0.680762767791748
+    },
+    {
+      "Model": "Decision Tree",
+      "Accuracy": 0.9175667993177942,
+      "Precision": 0.9730909090909091,
+      "Recall": 0.9253112033195021,
+      "F1": 0.9485997873094647,
+      "ROC-AUC": 0.9476417262117818,
+      "Training Time (s)": 0.051213741302490234
+    },
+    {
+      "Model": "KNN",
+      "Accuracy": 0.9141557703240477,
+      "Precision": 0.9354404841963685,
+      "Recall": 0.9619640387275242,
+      "F1": 0.9485168769178316,
+      "ROC-AUC": 0.9548327102638545,
+      "Training Time (s)": 0.0015823841094970703
+    },
+    {
+      "Model": "Text Logistic Regression (TF-IDF)",
+      "Accuracy": 0.877771461057419,
+      "Precision": 0.8907936507936508,
+      "Recall": 0.9702627939142462,
+      "F1": 0.9288315127441245,
+      "ROC-AUC": 0.9168102819720811,
+      "Training Time (s)": 0.09370541572570801
+    }
+  ],
+  "baseline_metrics": {
+    "Accuracy": 0.8220579874928937,
+    "Precision": 0.8220579874928937,
+    "Recall": 1.0,
+    "F1": 0.9023400936037441
+  },
+  "text_model_metrics": {
+    "Accuracy": 0.877771461057419,
+    "Precision": 0.8907936507936508,
+    "Recall": 0.9702627939142462,
+    "F1": 0.9288315127441245,
+    "ROC-AUC": 0.9168102819720811,
+    "Model": "Text Logistic Regression (TF-IDF)",
+    "Training Time (s)": 0.09370541572570801
+  },
+  "random_seed": 42
+}

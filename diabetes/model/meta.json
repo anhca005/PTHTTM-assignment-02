@@ -1,0 +1,54 @@
+{
+  "app": "diabetes",
+  "best_model_name": "Decision Tree",
+  "feature_cols": [
+    "age",
+    "bmi",
+    "HbA1c_level",
+    "blood_glucose_level",
+    "hypertension",
+    "heart_disease",
+    "gender",
+    "smoking_history"
+  ],
+  "numeric_cols": [
+    "age",
+    "bmi",
+    "HbA1c_level",
+    "blood_glucose_level",
+    "hypertension",
+    "heart_disease"
+  ],
+  "categorical_cols": [
+    "gender",
+    "smoking_history"
+  ],
+  "categorical_options": {
+    "gender": [
+      "Female",
+      "Male",
+      "Other"
+    ],
+    "smoking_history": [
+      "No Info",
+      "current",
+      "ever",
+      "former",
+      "never",
+      "not current"
+    ]
+  },
+  "target_col": "diabetes",
+  "class_labels": {
+    "0": "No diabetes",
+    "1": "Diabetes risk"
+  },
+  "test_metrics": {
+    "Accuracy": 0.9681020733652312,
+    "Precision": 0.9844868735083532,
+    "Recall": 0.6485849056603774,
+    "F1": 0.7819905213270142,
+    "ROC-AUC": 0.9710530812539968
+  },
+  "random_seed": 42
+}
