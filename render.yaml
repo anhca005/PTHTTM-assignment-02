@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: diabetes-api
+    runtime: python
+    plan: free
+    buildCommand: pip install -r diabetes/requirements.txt
+    startCommand: uvicorn app:app --host 0.0.0.0 --port $PORT --app-dir diabetes/api
+
+  - type: web
+    name: house-price-api
+    runtime: python
+    plan: free
+    buildCommand: pip install -r house_price/requirements.txt
+    startCommand: uvicorn app:app --host 0.0.0.0 --port $PORT --app-dir house_price/api
+
+  - type: web
+    name: ecommerce-api
+    runtime: python
+    plan: free
+    buildCommand: pip install -r ecommerce/requirements.txt
+    startCommand: uvicorn app:app --host 0.0.0.0 --port $PORT --app-dir ecommerce/api
