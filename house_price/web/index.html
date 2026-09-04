@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="vi" data-theme="dark">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -8,26 +8,38 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg-dark: #0B0F19;
-    --card-bg: rgba(30, 41, 59, 0.7);
+  :root[data-theme="dark"] {
+    --bg: #0B0F19;
+    --card-bg: rgba(30, 41, 59, 0.75);
     --card-border: rgba(51, 65, 85, 0.6);
+    --input-bg: #0F172A;
+    --input-border: #334155;
     --accent: #F59E0B;
     --accent-hover: #D97706;
     --text: #F8FAFC;
     --muted: #94A3B8;
     --danger: #EF4444;
-    --danger-bg: rgba(239, 68, 68, 0.12);
+    --shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
   }
-  * { box-sizing: border-box; }
+  :root[data-theme="light"] {
+    --bg: #F8FAFC;
+    --card-bg: #FFFFFF;
+    --card-border: #E2E8F0;
+    --input-bg: #F8FAFC;
+    --input-border: #CBD5E1;
+    --accent: #D97706;
+    --accent-hover: #B45309;
+    --text: #0F172A;
+    --muted: #64748B;
+    --danger: #DC2626;
+    --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+  }
+  
+  * { box-sizing: border-box; transition: background-color 0.25s, border-color 0.25s, color 0.25s; }
   body {
     margin: 0;
     font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
-    background: var(--bg-dark);
-    background-image: 
-      radial-gradient(at 10% 10%, rgba(245, 158, 11, 0.08) 0px, transparent 50%),
-      radial-gradient(at 90% 90%, rgba(59, 130, 246, 0.06) 0px, transparent 50%);
-    background-attachment: fixed;
+    background: var(--bg);
     color: var(--text);
     padding: 32px 16px;
     min-height: 100vh;
@@ -46,18 +58,19 @@
   }
   .brand { display: flex; align-items: center; gap: 14px; }
   .brand-icon {
-    width: 46px; height: 46px;
-    background: rgba(245, 158, 11, 0.15);
-    border: 1px solid rgba(245, 158, 11, 0.3);
-    border-radius: 12px;
+    width: 48px; height: 48px;
+    background: rgba(217, 119, 6, 0.12);
+    border: 1px solid rgba(217, 119, 6, 0.25);
+    border-radius: 14px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 24px;
+    font-size: 26px;
   }
-  h1 { font-size: 1.5rem; margin: 0; font-weight: 800; }
+  h1 { font-size: 1.55rem; margin: 0; font-weight: 800; }
   .subtitle { font-size: 0.85rem; color: var(--muted); margin-top: 2px; }
 
-  .lang-btn {
-    background: rgba(30, 41, 59, 0.8);
+  .controls-group { display: flex; gap: 10px; }
+  .control-btn {
+    background: var(--card-bg);
     border: 1px solid var(--card-border);
     color: var(--text);
     padding: 8px 14px;
@@ -66,11 +79,11 @@
     cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     font-size: 0.85rem;
-    transition: all 0.2s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
   }
-  .lang-btn:hover { background: var(--accent); color: #000; border-color: var(--accent); }
+  .control-btn:hover { border-color: var(--accent); color: var(--accent); }
 
   .server-bar {
     background: var(--card-bg);
@@ -82,14 +95,15 @@
     display: flex;
     align-items: center;
     gap: 16px;
+    box-shadow: var(--shadow);
   }
-  .server-bar label { font-size: 0.85rem; font-weight: 600; color: var(--accent); white-space: nowrap; }
+  .server-bar label { font-size: 0.85rem; font-weight: 700; color: var(--accent); white-space: nowrap; }
   .server-bar input {
     flex: 1;
-    background: #0F172A;
-    border: 1px solid #334155;
+    background: var(--input-bg);
+    border: 1px solid var(--input-border);
     border-radius: 8px;
-    padding: 8px 14px;
+    padding: 9px 14px;
     color: var(--text);
     font-family: inherit;
     font-size: 0.9rem;
@@ -102,9 +116,9 @@
     background: var(--card-bg);
     border: 1px solid var(--card-border);
     backdrop-filter: blur(12px);
-    border-radius: 16px;
+    border-radius: 18px;
     padding: 24px;
-    box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
+    box-shadow: var(--shadow);
   }
   .section-title {
     font-size: 1.05rem;
@@ -133,17 +147,16 @@
     width: 100%;
     padding: 11px 14px;
     border-radius: 10px;
-    border: 1px solid #334155;
-    background: #0F172A;
+    border: 1px solid var(--input-border);
+    background: var(--input-bg);
     color: var(--text);
     font-size: 0.95rem;
     font-family: inherit;
-    transition: all 0.2s;
   }
   .form-control:focus {
     outline: none;
     border-color: var(--accent);
-    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2);
+    box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.15);
   }
 
   /* Counter styling */
@@ -151,8 +164,8 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background: #0F172A;
-    border: 1px solid #334155;
+    background: var(--input-bg);
+    border: 1px solid var(--input-border);
     border-radius: 10px;
     padding: 6px 12px;
   }
@@ -160,13 +173,13 @@
     width: 28px; height: 28px;
     border-radius: 6px;
     border: none;
-    background: #1E293B;
+    background: var(--card-border);
     color: var(--text);
     font-weight: bold;
     cursor: pointer;
     display: flex; align-items: center; justify-content: center;
   }
-  .counter-btn:hover { background: var(--accent); color: #000; }
+  .counter-btn:hover { background: var(--accent); color: #FFF; }
   
   .submit-btn {
     width: 100%;
@@ -175,19 +188,17 @@
     border: none;
     border-radius: 12px;
     background: linear-gradient(135deg, var(--accent), var(--accent-hover));
-    color: #000;
+    color: #FFF;
     font-weight: 800;
     font-size: 1rem;
     cursor: pointer;
-    box-shadow: 0 6px 20px rgba(245, 158, 11, 0.3);
-    transition: all 0.2s;
+    box-shadow: 0 6px 20px rgba(217, 119, 6, 0.3);
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
   }
-  .submit-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(245, 158, 11, 0.4); }
-  .submit-btn:active { transform: translateY(1px); }
+  .submit-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(217, 119, 6, 0.4); }
   
   .result-card {
     min-height: 260px;
@@ -198,23 +209,21 @@
     text-align: center;
     border-radius: 14px;
     padding: 24px;
-    background: rgba(30, 27, 19, 0.8);
+    background: var(--card-bg);
     border: 1.5px solid var(--accent);
-    transition: all 0.3s;
   }
-  .result-card.placeholder { background: rgba(15, 23, 42, 0.5); border: 2px dashed #334155; }
+  .result-card.placeholder { background: var(--input-bg); border: 2px dashed var(--input-border); }
   
   .price-tag {
     font-size: 2.2rem;
     font-weight: 800;
     color: var(--accent);
     margin: 10px 0;
-    text-shadow: 0 2px 10px rgba(245, 158, 11, 0.2);
   }
   
   pre {
-    background: #0F172A;
-    border: 1px solid #334155;
+    background: var(--input-bg);
+    border: 1px solid var(--input-border);
     padding: 12px;
     border-radius: 10px;
     overflow-x: auto;
@@ -235,10 +244,17 @@
       </div>
     </div>
 
-    <!-- Language Selector Button -->
-    <button class="lang-btn" id="langBtn" onclick="toggleLang()">
-      <span id="langFlag">🌐</span> <span id="langText">EN</span>
-    </button>
+    <div class="controls-group">
+      <!-- Theme Switcher Button -->
+      <button class="control-btn" id="themeBtn" onclick="toggleTheme()">
+        <span id="themeIcon">🌙</span> <span id="themeText">Tối</span>
+      </button>
+
+      <!-- Language Selector Button -->
+      <button class="control-btn" id="langBtn" onclick="toggleLang()">
+        <span>🌐</span> <span id="langText">EN</span>
+      </button>
+    </div>
   </header>
 
   <div class="server-bar">
@@ -396,6 +412,14 @@
 
 <script>
 let currentLang = 'vi';
+let isDarkMode = true;
+
+function toggleTheme() {
+  isDarkMode = !isDarkMode;
+  document.documentElement.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
+  document.getElementById('themeIcon').textContent = isDarkMode ? '🌙' : '☀️';
+  document.getElementById('themeText').textContent = isDarkMode ? (currentLang === 'vi' ? 'Tối' : 'Dark') : (currentLang === 'vi' ? 'Sáng' : 'Light');
+}
 
 const i18n = {
   vi: {
@@ -439,6 +463,7 @@ const i18n = {
 function toggleLang() {
   currentLang = currentLang === 'vi' ? 'en' : 'vi';
   document.getElementById('langText').textContent = currentLang === 'vi' ? 'EN' : 'VI';
+  document.getElementById('themeText').textContent = isDarkMode ? (currentLang === 'vi' ? 'Tối' : 'Dark') : (currentLang === 'vi' ? 'Sáng' : 'Light');
   applyTranslations();
 }
 
@@ -534,7 +559,7 @@ document.getElementById('houseForm').addEventListener('submit', async (e) => {
     resContainer.innerHTML = `
       <div style="font-size:0.85rem; color:var(--muted); text-transform:uppercase; letter-spacing:1px;">${currentLang === 'vi' ? 'Ước tính giá thị trường' : 'Estimated Market Value'}</div>
       <div class="price-tag">${priceStr} ${unit}</div>
-      ${pricePerM2 ? `<div style="font-size:0.85rem; color:var(--accent); font-weight:700; background:rgba(245,158,11,0.15); padding:4px 12px; border-radius:20px;">${pricePerM2}</div>` : ''}
+      ${pricePerM2 ? `<div style="font-size:0.85rem; color:var(--accent); font-weight:700; background:rgba(217,119,6,0.12); padding:4px 12px; border-radius:20px;">${pricePerM2}</div>` : ''}
       <div style="margin-top:16px; font-size:0.8rem; color:var(--muted);">${currentLang === 'vi' ? 'Model AI sử dụng:' : 'AI Model used:'} <strong>${data.model_used || 'Gradient Boosting / XGBoost'}</strong></div>
     `;
   } catch (err) {

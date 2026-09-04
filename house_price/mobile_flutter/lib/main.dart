@@ -4,33 +4,74 @@ import 'package:http/http.dart' as http;
 
 void main() => runApp(const HousePriceApp());
 
-class HousePriceApp extends StatelessWidget {
+class HousePriceApp extends StatefulWidget {
   const HousePriceApp({super.key});
 
   @override
+  State<HousePriceApp> createState() => _HousePriceAppState();
+}
+
+class _HousePriceAppState extends State<HousePriceApp> {
+  bool isDarkMode = true;
+  String lang = 'vi'; // 'vi' or 'en'
+
+  void toggleTheme() => setState(() => isDarkMode = !isDarkMode);
+  void toggleLang() => setState(() => lang = lang == 'vi' ? 'en' : 'vi');
+
+  @override
   Widget build(BuildContext context) {
+    final primaryColor = isDarkMode ? const Color(0xFFF59E0B) : const Color(0xFFD97706);
+    final bgColor = isDarkMode ? const Color(0xFF0B0F19) : const Color(0xFFF8FAFC);
+    final cardColor = isDarkMode ? const Color(0xFF1E293B) : Colors.white;
+    final borderColor = isDarkMode ? const Color(0xFF334155) : const Color(0xFFE2E8F0);
+
     return MaterialApp(
       title: 'Real Estate Valuation AI',
       debugShowCheckedModeBanner: false,
+      themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,
       theme: ThemeData(
         useMaterial3: true,
-        brightness: Brightness.dark,
+        brightness: Brightness.light,
         colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFFF59E0B),
-          brightness: Brightness.dark,
-          surface: const Color(0xFF0F172A),
+          seedColor: primaryColor,
+          brightness: Brightness.light,
+          surface: cardColor,
         ),
-        scaffoldBackgroundColor: const Color(0xFF0B0F19),
+        scaffoldBackgroundColor: bgColor,
         cardTheme: CardTheme(
-          color: const Color(0xFF1E293B),
-          elevation: 0,
+          color: cardColor,
+          elevation: 2,
+          shadowColor: Colors.black.withOpacity(0.05),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
-            side: const BorderSide(color: Color(0xFF334155), width: 1),
+            side: BorderSide(color: borderColor, width: 1),
           ),
         ),
       ),
-      home: const HousePricePredictScreen(),
+      darkTheme: ThemeData(
+        useMaterial3: true,
+        brightness: Brightness.dark,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: primaryColor,
+          brightness: Brightness.dark,
+          surface: cardColor,
+        ),
+        scaffoldBackgroundColor: bgColor,
+        cardTheme: CardTheme(
+          color: cardColor,
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+            side: BorderSide(color: borderColor, width: 1),
+          ),
+        ),
+      ),
+      home: HousePricePredictScreen(
+        isDarkMode: isDarkMode,
+        lang: lang,
+        onToggleTheme: toggleTheme,
+        onToggleLang: toggleLang,
+      ),
     );
   }
 }
@@ -47,15 +88,24 @@ const provinces = [
 ];
 
 class HousePricePredictScreen extends StatefulWidget {
-  const HousePricePredictScreen({super.key});
+  final bool isDarkMode;
+  final String lang;
+  final VoidCallback onToggleTheme;
+  final VoidCallback onToggleLang;
+
+  const HousePricePredictScreen({
+    super.key,
+    required this.isDarkMode,
+    required this.lang,
+    required this.onToggleTheme,
+    required this.onToggleLang,
+  });
 
   @override
   State<HousePricePredictScreen> createState() => _HousePricePredictScreenState();
 }
 
 class _HousePricePredictScreenState extends State<HousePricePredictScreen> {
-  String lang = 'vi'; // 'vi' or 'en'
-
   final apiUrlCtrl = TextEditingController(text: 'http://192.168.1.10:8001');
   final areaCtrl = TextEditingController(text: '60');
   final frontageCtrl = TextEditingController(text: '4.5');
@@ -78,7 +128,7 @@ class _HousePricePredictScreenState extends State<HousePricePredictScreen> {
   String rawJson = '';
 
   String tr(String keyVi, String keyEn) {
-    return lang == 'vi' ? keyVi : keyEn;
+    return widget.lang == 'vi' ? keyVi : keyEn;
   }
 
   Future<void> predict() async {
@@ -145,13 +195,14 @@ class _HousePricePredictScreenState extends State<HousePricePredictScreen> {
     required IconData icon,
     required int value,
     required ValueChanged<int> onChanged,
+    required Color primaryHex,
   }) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Row(
           children: [
-            Icon(icon, size: 18, color: const Color(0xFFF59E0B)),
+            Icon(icon, size: 18, color: primaryHex),
             const SizedBox(width: 8),
             Text(title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
           ],
@@ -187,20 +238,24 @@ class _HousePricePredictScreenState extends State<HousePricePredictScreen> {
   @override
   Widget build(BuildContext context) {
     final areaVal = double.tryParse(areaCtrl.text) ?? 0;
+    final isDark = widget.isDarkMode;
+    final inputBg = isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC);
+    final primaryHex = isDark ? const Color(0xFFF59E0B) : const Color(0xFFD97706);
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color(0xFF0B0F19),
+        backgroundColor: isDark ? const Color(0xFF0B0F19) : Colors.white,
         elevation: 0,
+        scrolledUnderElevation: 1,
         title: Row(
           children: [
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: const Color(0xFFF59E0B).withOpacity(0.2),
+                color: primaryHex.withOpacity(0.15),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: const Icon(Icons.home_work_rounded, color: Color(0xFFF59E0B)),
+              child: Icon(Icons.home_work_rounded, color: primaryHex),
             ),
             const SizedBox(width: 12),
             Column(
@@ -212,26 +267,28 @@ class _HousePricePredictScreenState extends State<HousePricePredictScreen> {
                 ),
                 Text(
                   tr('Định giá Bất động sản AI', 'AI Property Valuation'),
-                  style: const TextStyle(fontSize: 11, color: Color(0xFF94A3B8)),
+                  style: TextStyle(fontSize: 11, color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
                 ),
               ],
             ),
           ],
         ),
         actions: [
+          // Theme Switcher Button
+          IconButton(
+            onPressed: widget.onToggleTheme,
+            icon: Icon(isDark ? Icons.light_mode : Icons.dark_mode, size: 20),
+            tooltip: isDark ? 'Chuyển Chế độ Sáng' : 'Chuyển Chế độ Tối',
+          ),
           // Language Switcher Button
           Padding(
             padding: const EdgeInsets.only(right: 12),
             child: ActionChip(
-              avatar: Text(lang == 'vi' ? '🇻🇳' : '🇬🇧', style: const TextStyle(fontSize: 14)),
-              label: Text(lang.toUpperCase(), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
-              backgroundColor: const Color(0xFF1E293B),
-              side: const BorderSide(color: Color(0xFF334155)),
-              onPressed: () {
-                setState(() {
-                  lang = lang == 'vi' ? 'en' : 'vi';
-                });
-              },
+              avatar: Text(widget.lang == 'vi' ? '🇻🇳' : '🇬🇧', style: const TextStyle(fontSize: 14)),
+              label: Text(widget.lang.toUpperCase(), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+              backgroundColor: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
+              side: BorderSide(color: isDark ? const Color(0xFF334155) : const Color(0xFFCBD5E1)),
+              onPressed: widget.onToggleLang,
             ),
           ),
         ],
@@ -250,11 +307,11 @@ class _HousePricePredictScreenState extends State<HousePricePredictScreen> {
                   children: [
                     Row(
                       children: [
-                        const Icon(Icons.dns, size: 18, color: Color(0xFFF59E0B)),
+                        Icon(Icons.dns, size: 18, color: primaryHex),
                         const SizedBox(width: 8),
                         Text(
                           tr('Cấu hình Kết nối Server API', 'API Connection Settings'),
-                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Color(0xFFF59E0B)),
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: primaryHex),
                         ),
                       ],
                     ),
@@ -267,7 +324,7 @@ class _HousePricePredictScreenState extends State<HousePricePredictScreen> {
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                         isDense: true,
                         filled: true,
-                        fillColor: const Color(0xFF0F172A),
+                        fillColor: inputBg,
                       ),
                     ),
                   ],
@@ -285,7 +342,7 @@ class _HousePricePredictScreenState extends State<HousePricePredictScreen> {
                   children: [
                     Row(
                       children: [
-                        const Icon(Icons.location_on, size: 18, color: Color(0xFFF59E0B)),
+                        Icon(Icons.location_on, size: 18, color: primaryHex),
                         const SizedBox(width: 8),
                         Text(tr('1. Vị trí & Pháp lý', '1. Location & Legal Status'), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
                       ],
@@ -301,7 +358,7 @@ class _HousePricePredictScreenState extends State<HousePricePredictScreen> {
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                         isDense: true,
                         filled: true,
-                        fillColor: const Color(0xFF0F172A),
+                        fillColor: inputBg,
                       ),
                       items: provinces.map((p) => DropdownMenuItem(value: p, child: Text(p))).toList(),
                       onChanged: (v) => setState(() => province = v!),
@@ -309,7 +366,7 @@ class _HousePricePredictScreenState extends State<HousePricePredictScreen> {
                     const SizedBox(height: 14),
 
                     // Legal status Chips
-                    Text(tr('Tình trạng pháp lý', 'Legal Status'), style: const TextStyle(fontSize: 12, color: Color(0xFF94A3B8))),
+                    Text(tr('Tình trạng pháp lý', 'Legal Status'), style: TextStyle(fontSize: 12, color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B))),
                     const SizedBox(height: 6),
                     Wrap(
                       spacing: 8,
@@ -323,7 +380,7 @@ class _HousePricePredictScreenState extends State<HousePricePredictScreen> {
                         return ChoiceChip(
                           label: Text(labelMap[opt]!),
                           selected: isSel,
-                          selectedColor: const Color(0xFFF59E0B),
+                          selectedColor: primaryHex,
                           onSelected: (sel) {
                             if (sel) setState(() => legalStatus = opt);
                           },
@@ -333,7 +390,7 @@ class _HousePricePredictScreenState extends State<HousePricePredictScreen> {
                     const SizedBox(height: 12),
 
                     // Furniture State Chips
-                    Text(tr('Tình trạng nội thất', 'Furniture Condition'), style: const TextStyle(fontSize: 12, color: Color(0xFF94A3B8))),
+                    Text(tr('Tình trạng nội thất', 'Furniture Condition'), style: TextStyle(fontSize: 12, color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B))),
                     const SizedBox(height: 6),
                     Wrap(
                       spacing: 8,
@@ -347,7 +404,7 @@ class _HousePricePredictScreenState extends State<HousePricePredictScreen> {
                         return ChoiceChip(
                           label: Text(labelMap[opt]!),
                           selected: isSel,
-                          selectedColor: const Color(0xFFF59E0B),
+                          selectedColor: primaryHex,
                           onSelected: (sel) {
                             if (sel) setState(() => furnitureState = opt);
                           },
@@ -369,7 +426,7 @@ class _HousePricePredictScreenState extends State<HousePricePredictScreen> {
                   children: [
                     Row(
                       children: [
-                        const Icon(Icons.square_foot, size: 18, color: Color(0xFFF59E0B)),
+                        Icon(Icons.square_foot, size: 18, color: primaryHex),
                         const SizedBox(width: 8),
                         Text(tr('2. Thông số Kích thước', '2. Dimensions & Road Width'), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
                       ],
@@ -387,7 +444,7 @@ class _HousePricePredictScreenState extends State<HousePricePredictScreen> {
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                         isDense: true,
                         filled: true,
-                        fillColor: const Color(0xFF0F172A),
+                        fillColor: inputBg,
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -404,7 +461,7 @@ class _HousePricePredictScreenState extends State<HousePricePredictScreen> {
                               border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                               isDense: true,
                               filled: true,
-                              fillColor: const Color(0xFF0F172A),
+                              fillColor: inputBg,
                             ),
                           ),
                         ),
@@ -419,7 +476,7 @@ class _HousePricePredictScreenState extends State<HousePricePredictScreen> {
                               border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                               isDense: true,
                               filled: true,
-                              fillColor: const Color(0xFF0F172A),
+                              fillColor: inputBg,
                             ),
                           ),
                         ),
@@ -440,7 +497,7 @@ class _HousePricePredictScreenState extends State<HousePricePredictScreen> {
                   children: [
                     Row(
                       children: [
-                        const Icon(Icons.king_bed, size: 18, color: Color(0xFFF59E0B)),
+                        Icon(Icons.king_bed, size: 18, color: primaryHex),
                         const SizedBox(width: 8),
                         Text(tr('3. Quy mô & Hướng nhà', '3. Scale & Orientation'), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
                       ],
@@ -452,20 +509,23 @@ class _HousePricePredictScreenState extends State<HousePricePredictScreen> {
                       icon: Icons.layers,
                       value: floors,
                       onChanged: (val) => setState(() => floors = val),
+                      primaryHex: primaryHex,
                     ),
-                    const Divider(color: Color(0xFF334155)),
+                    Divider(color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0)),
                     _buildCounterTile(
                       title: tr('Số phòng ngủ (Bedrooms)', 'Bedrooms'),
                       icon: Icons.bed,
                       value: bedrooms,
                       onChanged: (val) => setState(() => bedrooms = val),
+                      primaryHex: primaryHex,
                     ),
-                    const Divider(color: Color(0xFF334155)),
+                    Divider(color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0)),
                     _buildCounterTile(
                       title: tr('Số phòng tắm (Bathrooms)', 'Bathrooms'),
                       icon: Icons.bathtub,
                       value: bathrooms,
                       onChanged: (val) => setState(() => bathrooms = val),
+                      primaryHex: primaryHex,
                     ),
                     const SizedBox(height: 14),
 
@@ -480,7 +540,7 @@ class _HousePricePredictScreenState extends State<HousePricePredictScreen> {
                               border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                               isDense: true,
                               filled: true,
-                              fillColor: const Color(0xFF0F172A),
+                              fillColor: inputBg,
                             ),
                             items: houseDirections.map((d) => DropdownMenuItem(value: d, child: Text(d))).toList(),
                             onChanged: (v) => setState(() => houseDirection = v!),
@@ -495,7 +555,7 @@ class _HousePricePredictScreenState extends State<HousePricePredictScreen> {
                               border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                               isDense: true,
                               filled: true,
-                              fillColor: const Color(0xFF0F172A),
+                              fillColor: inputBg,
                             ),
                             items: houseDirections.map((d) => DropdownMenuItem(value: d, child: Text(d))).toList(),
                             onChanged: (v) => setState(() => balconyDirection = v!),
@@ -514,12 +574,12 @@ class _HousePricePredictScreenState extends State<HousePricePredictScreen> {
               height: 52,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(14),
-                gradient: const LinearGradient(
-                  colors: [Color(0xFFF59E0B), Color(0xFFD97706)],
+                gradient: LinearGradient(
+                  colors: [primaryHex, const Color(0xFFB45309)],
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFFF59E0B).withOpacity(0.3),
+                    color: primaryHex.withOpacity(0.35),
                     blurRadius: 12,
                     offset: const Offset(0, 4),
                   ),
@@ -541,11 +601,11 @@ class _HousePricePredictScreenState extends State<HousePricePredictScreen> {
                     : Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Icon(Icons.calculate, color: Colors.black),
+                          const Icon(Icons.calculate, color: Colors.white),
                           const SizedBox(width: 8),
                           Text(
                             tr('Định Giá Ngay (AI Valuation)', 'Calculate Valuation with AI'),
-                            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black),
+                            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
                           ),
                         ],
                       ),
@@ -556,10 +616,10 @@ class _HousePricePredictScreenState extends State<HousePricePredictScreen> {
             // Result Display
             if (predictedPrice != null) ...[
               Card(
-                color: const Color(0xFF1E1B13),
+                color: isDark ? const Color(0xFF1E1B13) : const Color(0xFFFFFBEB),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
-                  side: const BorderSide(color: Color(0xFFF59E0B), width: 1.5),
+                  side: BorderSide(color: primaryHex, width: 1.5),
                 ),
                 child: Padding(
                   padding: const EdgeInsets.all(20),
@@ -567,28 +627,28 @@ class _HousePricePredictScreenState extends State<HousePricePredictScreen> {
                     children: [
                       Text(
                         tr('Giá trị Ước tính Bất động sản', 'Estimated Property Valuation'),
-                        style: const TextStyle(fontSize: 13, color: Color(0xFFCBD5E1)),
+                        style: TextStyle(fontSize: 13, color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF475569)),
                       ),
                       const SizedBox(height: 8),
                       Text(
                         '$predictedPrice $priceUnit',
                         textAlign: TextAlign.center,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.w800,
-                          color: Color(0xFFF59E0B),
+                          color: primaryHex,
                         ),
                       ),
                       const SizedBox(height: 10),
 
                       if (areaVal > 0 && double.tryParse(predictedPrice!) != null) ...[
                         Chip(
-                          avatar: const Icon(Icons.sell, size: 14, color: Colors.amberAccent),
+                          avatar: Icon(Icons.sell, size: 14, color: primaryHex),
                           label: Text(
                             tr('Trung bình ~${((double.parse(predictedPrice!) * 1000) / areaVal).toStringAsFixed(1)} triệu / m²', 'Avg ~${((double.parse(predictedPrice!) * 1000) / areaVal).toStringAsFixed(1)} Million / m²'),
                             style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
                           ),
-                          backgroundColor: Colors.amber.withOpacity(0.15),
+                          backgroundColor: primaryHex.withOpacity(0.15),
                         ),
                         const SizedBox(height: 10),
                       ],
@@ -596,7 +656,7 @@ class _HousePricePredictScreenState extends State<HousePricePredictScreen> {
                       if (modelUsed != null)
                         Text(
                           tr('Thuật toán AI sử dụng: $modelUsed', 'AI Model Algorithm: $modelUsed'),
-                          style: const TextStyle(fontSize: 11, color: Color(0xFF94A3B8)),
+                          style: TextStyle(fontSize: 11, color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
                         ),
                     ],
                   ),
@@ -606,18 +666,18 @@ class _HousePricePredictScreenState extends State<HousePricePredictScreen> {
 
               // Raw JSON
               ExpansionTile(
-                title: Text(tr('Xem phản hồi JSON gốc', 'View Raw JSON Response'), style: const TextStyle(fontSize: 13, color: Color(0xFF94A3B8))),
+                title: Text(tr('Xem phản hồi JSON gốc', 'View Raw JSON Response'), style: TextStyle(fontSize: 13, color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B))),
                 children: [
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF0F172A),
+                      color: inputBg,
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Text(
                       rawJson,
-                      style: const TextStyle(fontFamily: 'monospace', fontSize: 11, color: Color(0xFFF59E0B)),
+                      style: TextStyle(fontFamily: 'monospace', fontSize: 11, color: primaryHex),
                     ),
                   ),
                 ],

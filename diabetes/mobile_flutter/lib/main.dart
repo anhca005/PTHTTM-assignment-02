@@ -4,47 +4,97 @@ import 'package:http/http.dart' as http;
 
 void main() => runApp(const DiabetesApp());
 
-class DiabetesApp extends StatelessWidget {
+class DiabetesApp extends StatefulWidget {
   const DiabetesApp({super.key});
 
   @override
+  State<DiabetesApp> createState() => _DiabetesAppState();
+}
+
+class _DiabetesAppState extends State<DiabetesApp> {
+  bool isDarkMode = true;
+  String lang = 'vi'; // 'vi' or 'en'
+
+  void toggleTheme() => setState(() => isDarkMode = !isDarkMode);
+  void toggleLang() => setState(() => lang = lang == 'vi' ? 'en' : 'vi');
+
+  @override
   Widget build(BuildContext context) {
+    final primaryColor = isDarkMode ? const Color(0xFF0EA5E9) : const Color(0xFF0284C7);
+    final bgColor = isDarkMode ? const Color(0xFF090D16) : const Color(0xFFF1F5F9);
+    final cardColor = isDarkMode ? const Color(0xFF1E293B) : Colors.white;
+    final borderColor = isDarkMode ? const Color(0xFF334155) : const Color(0xFFE2E8F0);
+
     return MaterialApp(
-      title: 'Diabetes Risk AI Check',
+      title: 'Diabetes Risk AI',
       debugShowCheckedModeBanner: false,
+      themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,
       theme: ThemeData(
         useMaterial3: true,
-        brightness: Brightness.dark,
+        brightness: Brightness.light,
         colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF0EA5E9),
-          brightness: Brightness.dark,
-          surface: const Color(0xFF0F172A),
+          seedColor: primaryColor,
+          brightness: Brightness.light,
+          surface: cardColor,
         ),
-        scaffoldBackgroundColor: const Color(0xFF090D16),
+        scaffoldBackgroundColor: bgColor,
         cardTheme: CardTheme(
-          color: const Color(0xFF1E293B),
-          elevation: 0,
+          color: cardColor,
+          elevation: 2,
+          shadowColor: Colors.black.withOpacity(0.05),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
-            side: const BorderSide(color: Color(0xFF334155), width: 1),
+            side: BorderSide(color: borderColor, width: 1),
           ),
         ),
       ),
-      home: const DiabetesPredictScreen(),
+      darkTheme: ThemeData(
+        useMaterial3: true,
+        brightness: Brightness.dark,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: primaryColor,
+          brightness: Brightness.dark,
+          surface: cardColor,
+        ),
+        scaffoldBackgroundColor: bgColor,
+        cardTheme: CardTheme(
+          color: cardColor,
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+            side: BorderSide(color: borderColor, width: 1),
+          ),
+        ),
+      ),
+      home: DiabetesPredictScreen(
+        isDarkMode: isDarkMode,
+        lang: lang,
+        onToggleTheme: toggleTheme,
+        onToggleLang: toggleLang,
+      ),
     );
   }
 }
 
 class DiabetesPredictScreen extends StatefulWidget {
-  const DiabetesPredictScreen({super.key});
+  final bool isDarkMode;
+  final String lang;
+  final VoidCallback onToggleTheme;
+  final VoidCallback onToggleLang;
+
+  const DiabetesPredictScreen({
+    super.key,
+    required this.isDarkMode,
+    required this.lang,
+    required this.onToggleTheme,
+    required this.onToggleLang,
+  });
 
   @override
   State<DiabetesPredictScreen> createState() => _DiabetesPredictScreenState();
 }
 
 class _DiabetesPredictScreenState extends State<DiabetesPredictScreen> {
-  String lang = 'vi'; // 'vi' or 'en'
-
   final apiUrlCtrl = TextEditingController(text: 'http://192.168.1.10:8000');
   final ageCtrl = TextEditingController(text: '45');
   final bmiCtrl = TextEditingController(text: '24.5');
@@ -72,7 +122,7 @@ class _DiabetesPredictScreenState extends State<DiabetesPredictScreen> {
   ];
 
   String tr(String keyVi, String keyEn) {
-    return lang == 'vi' ? keyVi : keyEn;
+    return widget.lang == 'vi' ? keyVi : keyEn;
   }
 
   Future<void> predict() async {
@@ -143,7 +193,7 @@ class _DiabetesPredictScreenState extends State<DiabetesPredictScreen> {
   }
 
   Color _getBmiColor(double bmi) {
-    if (bmi < 18.5) return const Color(0xFF38BDF8);
+    if (bmi < 18.5) return const Color(0xFF0EA5E9);
     if (bmi < 24.9) return const Color(0xFF10B981);
     if (bmi < 29.9) return const Color(0xFFF59E0B);
     return const Color(0xFFEF4444);
@@ -152,20 +202,24 @@ class _DiabetesPredictScreenState extends State<DiabetesPredictScreen> {
   @override
   Widget build(BuildContext context) {
     final currentBmi = double.tryParse(bmiCtrl.text) ?? 0;
+    final isDark = widget.isDarkMode;
+    final inputBg = isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC);
+    final primaryHex = isDark ? const Color(0xFF0EA5E9) : const Color(0xFF0284C7);
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color(0xFF0F172A),
+        backgroundColor: isDark ? const Color(0xFF0F172A) : Colors.white,
         elevation: 0,
+        scrolledUnderElevation: 1,
         title: Row(
           children: [
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: const Color(0xFF0EA5E9).withOpacity(0.2),
+                color: primaryHex.withOpacity(0.15),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: const Icon(Icons.health_and_safety, color: Color(0xFF0EA5E9)),
+              child: Icon(Icons.health_and_safety, color: primaryHex),
             ),
             const SizedBox(width: 12),
             Column(
@@ -177,26 +231,28 @@ class _DiabetesPredictScreenState extends State<DiabetesPredictScreen> {
                 ),
                 Text(
                   tr('Dự đoán nguy cơ tiểu đường', 'Diabetes Risk Assessment'),
-                  style: const TextStyle(fontSize: 11, color: Color(0xFF94A3B8)),
+                  style: TextStyle(fontSize: 11, color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
                 ),
               ],
             ),
           ],
         ),
         actions: [
+          // Theme Switcher Button
+          IconButton(
+            onPressed: widget.onToggleTheme,
+            icon: Icon(isDark ? Icons.light_mode : Icons.dark_mode, size: 20),
+            tooltip: isDark ? 'Chuyển Chế độ Sáng' : 'Chuyển Chế độ Tối',
+          ),
           // Language Switcher Button
           Padding(
             padding: const EdgeInsets.only(right: 12),
             child: ActionChip(
-              avatar: Text(lang == 'vi' ? '🇻🇳' : '🇬🇧', style: const TextStyle(fontSize: 14)),
-              label: Text(lang.toUpperCase(), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
-              backgroundColor: const Color(0xFF1E293B),
-              side: const BorderSide(color: Color(0xFF334155)),
-              onPressed: () {
-                setState(() {
-                  lang = lang == 'vi' ? 'en' : 'vi';
-                });
-              },
+              avatar: Text(widget.lang == 'vi' ? '🇻🇳' : '🇬🇧', style: const TextStyle(fontSize: 14)),
+              label: Text(widget.lang.toUpperCase(), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+              backgroundColor: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
+              side: BorderSide(color: isDark ? const Color(0xFF334155) : const Color(0xFFCBD5E1)),
+              onPressed: widget.onToggleLang,
             ),
           ),
         ],
@@ -215,11 +271,11 @@ class _DiabetesPredictScreenState extends State<DiabetesPredictScreen> {
                   children: [
                     Row(
                       children: [
-                        const Icon(Icons.dns, size: 18, color: Color(0xFF0EA5E9)),
+                        Icon(Icons.dns, size: 18, color: primaryHex),
                         const SizedBox(width: 8),
                         Text(
                           tr('Cấu hình Kết nối API', 'API Connection Settings'),
-                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Color(0xFF0EA5E9)),
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: primaryHex),
                         ),
                       ],
                     ),
@@ -232,7 +288,7 @@ class _DiabetesPredictScreenState extends State<DiabetesPredictScreen> {
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                         isDense: true,
                         filled: true,
-                        fillColor: const Color(0xFF0F172A),
+                        fillColor: inputBg,
                       ),
                     ),
                   ],
@@ -250,7 +306,7 @@ class _DiabetesPredictScreenState extends State<DiabetesPredictScreen> {
                   children: [
                     Row(
                       children: [
-                        const Icon(Icons.person, size: 18, color: Color(0xFF38BDF8)),
+                        Icon(Icons.person, size: 18, color: primaryHex),
                         const SizedBox(width: 8),
                         Text(tr('1. Thông tin cá nhân', '1. Personal Information'), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
                       ],
@@ -258,7 +314,7 @@ class _DiabetesPredictScreenState extends State<DiabetesPredictScreen> {
                     const SizedBox(height: 14),
 
                     // Gender Selector
-                    Text(tr('Giới tính', 'Gender'), style: const TextStyle(fontSize: 12, color: Color(0xFF94A3B8))),
+                    Text(tr('Giới tính', 'Gender'), style: TextStyle(fontSize: 12, color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B))),
                     const SizedBox(height: 6),
                     SegmentedButton<String>(
                       segments: [
@@ -269,7 +325,7 @@ class _DiabetesPredictScreenState extends State<DiabetesPredictScreen> {
                       selected: {gender},
                       onSelectionChanged: (set) => setState(() => gender = set.first),
                       style: SegmentedButton.styleFrom(
-                        selectedBackgroundColor: const Color(0xFF0EA5E9),
+                        selectedBackgroundColor: primaryHex,
                         selectedForegroundColor: Colors.white,
                       ),
                     ),
@@ -285,7 +341,7 @@ class _DiabetesPredictScreenState extends State<DiabetesPredictScreen> {
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                         isDense: true,
                         filled: true,
-                        fillColor: const Color(0xFF0F172A),
+                        fillColor: inputBg,
                       ),
                     ),
                   ],
@@ -303,7 +359,7 @@ class _DiabetesPredictScreenState extends State<DiabetesPredictScreen> {
                   children: [
                     Row(
                       children: [
-                        const Icon(Icons.medical_services, size: 18, color: Color(0xFF38BDF8)),
+                        Icon(Icons.medical_services, size: 18, color: primaryHex),
                         const SizedBox(width: 8),
                         Text(tr('2. Tiền sử Y tế & Thói quen', '2. Medical History & Habits'), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
                       ],
@@ -313,16 +369,16 @@ class _DiabetesPredictScreenState extends State<DiabetesPredictScreen> {
                     // Hypertension & Heart disease Switches
                     SwitchListTile(
                       title: Text(tr('Tăng huyết áp (Hypertension)', 'Hypertension'), style: const TextStyle(fontSize: 14)),
-                      subtitle: Text(hypertension == 1 ? tr('Có tiền sử cao huyết áp', 'Has hypertension history') : tr('Không có', 'None'), style: const TextStyle(fontSize: 12, color: Color(0xFF94A3B8))),
+                      subtitle: Text(hypertension == 1 ? tr('Có tiền sử cao huyết áp', 'Has hypertension history') : tr('Không có', 'None'), style: TextStyle(fontSize: 12, color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B))),
                       value: hypertension == 1,
                       activeColor: const Color(0xFFEF4444),
                       onChanged: (val) => setState(() => hypertension = val ? 1 : 0),
                       contentPadding: EdgeInsets.zero,
                     ),
-                    const Divider(color: Color(0xFF334155)),
+                    Divider(color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0)),
                     SwitchListTile(
                       title: Text(tr('Bệnh tim mạch (Heart Disease)', 'Heart Disease'), style: const TextStyle(fontSize: 14)),
-                      subtitle: Text(heartDisease == 1 ? tr('Có tiền sử bệnh tim', 'Has heart disease history') : tr('Không có', 'None'), style: const TextStyle(fontSize: 12, color: Color(0xFF94A3B8))),
+                      subtitle: Text(heartDisease == 1 ? tr('Có tiền sử bệnh tim', 'Has heart disease history') : tr('Không có', 'None'), style: TextStyle(fontSize: 12, color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B))),
                       value: heartDisease == 1,
                       activeColor: const Color(0xFFEF4444),
                       onChanged: (val) => setState(() => heartDisease = val ? 1 : 0),
@@ -331,7 +387,7 @@ class _DiabetesPredictScreenState extends State<DiabetesPredictScreen> {
                     const SizedBox(height: 10),
 
                     // Smoking History Chips
-                    Text(tr('Tiền sử hút thuốc', 'Smoking History'), style: const TextStyle(fontSize: 12, color: Color(0xFF94A3B8))),
+                    Text(tr('Tiền sử hút thuốc', 'Smoking History'), style: TextStyle(fontSize: 12, color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B))),
                     const SizedBox(height: 8),
                     Wrap(
                       spacing: 8,
@@ -341,7 +397,7 @@ class _DiabetesPredictScreenState extends State<DiabetesPredictScreen> {
                         return ChoiceChip(
                           label: Text(opt),
                           selected: isSel,
-                          selectedColor: const Color(0xFF0EA5E9),
+                          selectedColor: primaryHex,
                           onSelected: (sel) {
                             if (sel) setState(() => smokingHistory = opt);
                           },
@@ -363,7 +419,7 @@ class _DiabetesPredictScreenState extends State<DiabetesPredictScreen> {
                   children: [
                     Row(
                       children: [
-                        const Icon(Icons.monitor_weight, size: 18, color: Color(0xFF38BDF8)),
+                        Icon(Icons.monitor_weight, size: 18, color: primaryHex),
                         const SizedBox(width: 8),
                         Text(tr('3. Chỉ số Xét nghiệm & Thân hình', '3. Biomarkers & Physical Metrics'), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
                       ],
@@ -381,7 +437,7 @@ class _DiabetesPredictScreenState extends State<DiabetesPredictScreen> {
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                         isDense: true,
                         filled: true,
-                        fillColor: const Color(0xFF0F172A),
+                        fillColor: inputBg,
                         suffixIcon: currentBmi > 0
                             ? Padding(
                                 padding: const EdgeInsets.only(right: 8),
@@ -390,7 +446,7 @@ class _DiabetesPredictScreenState extends State<DiabetesPredictScreen> {
                                     _getBmiCategory(currentBmi),
                                     style: const TextStyle(fontSize: 10, color: Colors.white, fontWeight: FontWeight.bold),
                                   ),
-                                  backgroundColor: _getBmiColor(currentBmi).withOpacity(0.8),
+                                  backgroundColor: _getBmiColor(currentBmi).withOpacity(0.85),
                                   padding: EdgeInsets.zero,
                                   visualDensity: VisualDensity.compact,
                                 ),
@@ -410,7 +466,7 @@ class _DiabetesPredictScreenState extends State<DiabetesPredictScreen> {
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                         isDense: true,
                         filled: true,
-                        fillColor: const Color(0xFF0F172A),
+                        fillColor: inputBg,
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -425,7 +481,7 @@ class _DiabetesPredictScreenState extends State<DiabetesPredictScreen> {
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                         isDense: true,
                         filled: true,
-                        fillColor: const Color(0xFF0F172A),
+                        fillColor: inputBg,
                       ),
                     ),
                   ],
@@ -439,12 +495,12 @@ class _DiabetesPredictScreenState extends State<DiabetesPredictScreen> {
               height: 52,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(14),
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF0EA5E9), Color(0xFF2563EB)],
+                gradient: LinearGradient(
+                  colors: [primaryHex, const Color(0xFF2563EB)],
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFF0EA5E9).withOpacity(0.3),
+                    color: primaryHex.withOpacity(0.35),
                     blurRadius: 12,
                     offset: const Offset(0, 4),
                   ),
@@ -481,7 +537,9 @@ class _DiabetesPredictScreenState extends State<DiabetesPredictScreen> {
             // Result Display
             if (resultTitle != null) ...[
               Card(
-                color: isRisk == true ? const Color(0xFF451A1A) : const Color(0xFF064E3B),
+                color: isRisk == true 
+                    ? (isDark ? const Color(0xFF451A1A) : const Color(0xFFFEF2F2))
+                    : (isDark ? const Color(0xFF064E3B) : const Color(0xFFECFDF5)),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                   side: BorderSide(
@@ -496,7 +554,7 @@ class _DiabetesPredictScreenState extends State<DiabetesPredictScreen> {
                       Icon(
                         isRisk == true ? Icons.warning_amber_rounded : Icons.check_circle_outline,
                         size: 48,
-                        color: isRisk == true ? const Color(0xFFF87171) : const Color(0xFF34D399),
+                        color: isRisk == true ? const Color(0xFFEF4444) : const Color(0xFF10B981),
                       ),
                       const SizedBox(height: 10),
                       Text(
@@ -505,7 +563,7 @@ class _DiabetesPredictScreenState extends State<DiabetesPredictScreen> {
                         style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
-                          color: isRisk == true ? const Color(0xFFF87171) : const Color(0xFF34D399),
+                          color: isRisk == true ? const Color(0xFFEF4444) : const Color(0xFF10B981),
                         ),
                       ),
                       const SizedBox(height: 12),
@@ -513,7 +571,7 @@ class _DiabetesPredictScreenState extends State<DiabetesPredictScreen> {
                       if (confidence != null) ...[
                         Text(
                           tr('Độ tin cậy mô hình: ${(confidence! * 100).toStringAsFixed(1)}%', 'Model Confidence: ${(confidence! * 100).toStringAsFixed(1)}%'),
-                          style: const TextStyle(fontSize: 13, color: Color(0xFFE2E8F0)),
+                          style: TextStyle(fontSize: 13, color: isDark ? const Color(0xFFE2E8F0) : const Color(0xFF334155)),
                         ),
                         const SizedBox(height: 8),
                         ClipRRect(
@@ -521,7 +579,7 @@ class _DiabetesPredictScreenState extends State<DiabetesPredictScreen> {
                           child: LinearProgressIndicator(
                             value: confidence,
                             minHeight: 8,
-                            backgroundColor: Colors.black26,
+                            backgroundColor: Colors.black12,
                             color: isRisk == true ? const Color(0xFFEF4444) : const Color(0xFF10B981),
                           ),
                         ),
@@ -532,7 +590,7 @@ class _DiabetesPredictScreenState extends State<DiabetesPredictScreen> {
                             ? tr('⚠️ Bạn có các chỉ số nằm trong nhóm nguy cơ cao. Hãy tham khảo ý kiến bác sĩ chuyên khoa.', '⚠️ Your metrics indicate high risk. Please consult a medical specialist for clinical diagnosis.')
                             : tr('✅ Các chỉ số hiện tại nằm trong giới hạn an toàn. Duy trì chế độ ăn uống & tập luyện lành mạnh.', '✅ Your metrics are within safe limits. Continue maintaining a healthy diet and lifestyle.'),
                         textAlign: TextAlign.center,
-                        style: const TextStyle(fontSize: 12, color: Color(0xFFCBD5E1)),
+                        style: TextStyle(fontSize: 12, color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF475569)),
                       ),
                     ],
                   ),
@@ -542,18 +600,18 @@ class _DiabetesPredictScreenState extends State<DiabetesPredictScreen> {
 
               // Expandable Raw Json
               ExpansionTile(
-                title: Text(tr('Xem phản hồi JSON gốc', 'View Raw JSON Response'), style: const TextStyle(fontSize: 13, color: Color(0xFF94A3B8))),
+                title: Text(tr('Xem phản hồi JSON gốc', 'View Raw JSON Response'), style: TextStyle(fontSize: 13, color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B))),
                 children: [
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF0F172A),
+                      color: inputBg,
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Text(
                       rawJson,
-                      style: const TextStyle(fontFamily: 'monospace', fontSize: 11, color: Color(0xFF38BDF8)),
+                      style: TextStyle(fontFamily: 'monospace', fontSize: 11, color: primaryHex),
                     ),
                   ),
                 ],

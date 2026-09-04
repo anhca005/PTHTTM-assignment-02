@@ -4,33 +4,74 @@ import 'package:http/http.dart' as http;
 
 void main() => runApp(const EcommerceApp());
 
-class EcommerceApp extends StatelessWidget {
+class EcommerceApp extends StatefulWidget {
   const EcommerceApp({super.key});
 
   @override
+  State<EcommerceApp> createState() => _EcommerceAppState();
+}
+
+class _EcommerceAppState extends State<EcommerceApp> {
+  bool isDarkMode = true;
+  String lang = 'vi'; // 'vi' or 'en'
+
+  void toggleTheme() => setState(() => isDarkMode = !isDarkMode);
+  void toggleLang() => setState(() => lang = lang == 'vi' ? 'en' : 'vi');
+
+  @override
   Widget build(BuildContext context) {
+    final primaryColor = isDarkMode ? const Color(0xFF8B5CF6) : const Color(0xFF7C3AED);
+    final bgColor = isDarkMode ? const Color(0xFF090D16) : const Color(0xFFFDF2F8);
+    final cardColor = isDarkMode ? const Color(0xFF1E293B) : Colors.white;
+    final borderColor = isDarkMode ? const Color(0xFF334155) : const Color(0xFFFBCFE8);
+
     return MaterialApp(
       title: 'E-Commerce Recommendation AI',
       debugShowCheckedModeBanner: false,
+      themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,
       theme: ThemeData(
         useMaterial3: true,
-        brightness: Brightness.dark,
+        brightness: Brightness.light,
         colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF8B5CF6),
-          brightness: Brightness.dark,
-          surface: const Color(0xFF0F172A),
+          seedColor: primaryColor,
+          brightness: Brightness.light,
+          surface: cardColor,
         ),
-        scaffoldBackgroundColor: const Color(0xFF090D16),
+        scaffoldBackgroundColor: bgColor,
         cardTheme: CardTheme(
-          color: const Color(0xFF1E293B),
-          elevation: 0,
+          color: cardColor,
+          elevation: 2,
+          shadowColor: Colors.purple.withOpacity(0.08),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
-            side: const BorderSide(color: Color(0xFF334155), width: 1),
+            side: BorderSide(color: borderColor, width: 1),
           ),
         ),
       ),
-      home: const EcommercePredictScreen(),
+      darkTheme: ThemeData(
+        useMaterial3: true,
+        brightness: Brightness.dark,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: primaryColor,
+          brightness: Brightness.dark,
+          surface: cardColor,
+        ),
+        scaffoldBackgroundColor: bgColor,
+        cardTheme: CardTheme(
+          color: cardColor,
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+            side: BorderSide(color: borderColor, width: 1),
+          ),
+        ),
+      ),
+      home: EcommercePredictScreen(
+        isDarkMode: isDarkMode,
+        lang: lang,
+        onToggleTheme: toggleTheme,
+        onToggleLang: toggleLang,
+      ),
     );
   }
 }
@@ -44,7 +85,18 @@ const classes = [
 ];
 
 class EcommercePredictScreen extends StatefulWidget {
-  const EcommercePredictScreen({super.key});
+  final bool isDarkMode;
+  final String lang;
+  final VoidCallback onToggleTheme;
+  final VoidCallback onToggleLang;
+
+  const EcommercePredictScreen({
+    super.key,
+    required this.isDarkMode,
+    required this.lang,
+    required this.onToggleTheme,
+    required this.onToggleLang,
+  });
 
   @override
   State<EcommercePredictScreen> createState() => _EcommercePredictScreenState();
@@ -52,7 +104,6 @@ class EcommercePredictScreen extends StatefulWidget {
 
 class _EcommercePredictScreenState extends State<EcommercePredictScreen> with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  String lang = 'vi'; // 'vi' or 'en'
 
   final apiUrlCtrl = TextEditingController(text: 'http://192.168.1.10:8002');
 
@@ -92,7 +143,7 @@ class _EcommercePredictScreenState extends State<EcommercePredictScreen> with Si
   }
 
   String tr(String keyVi, String keyEn) {
-    return lang == 'vi' ? keyVi : keyEn;
+    return widget.lang == 'vi' ? keyVi : keyEn;
   }
 
   Future<void> predictStructured() async {
@@ -188,8 +239,8 @@ class _EcommercePredictScreenState extends State<EcommercePredictScreen> with Si
   void _fillPositivePreset() {
     setState(() {
       rating = 5;
-      titleCtrl.text = lang == 'vi' ? 'Tuyệt vời ngoài mong đợi!' : 'Exceeded Expectations!';
-      reviewCtrl.text = lang == 'vi' 
+      titleCtrl.text = widget.lang == 'vi' ? 'Tuyệt vời ngoài mong đợi!' : 'Exceeded Expectations!';
+      reviewCtrl.text = widget.lang == 'vi' 
           ? 'Chất vải mềm mịn, tôn dáng và mặc rất thoải mái. Rất đáng tiền!' 
           : 'Great quality fabric, very flattering fit and super comfortable. Highly recommended!';
     });
@@ -198,8 +249,8 @@ class _EcommercePredictScreenState extends State<EcommercePredictScreen> with Si
   void _fillNegativePreset() {
     setState(() {
       rating = 1;
-      titleCtrl.text = lang == 'vi' ? 'Rất thất vọng' : 'Very Disappointed';
-      reviewCtrl.text = lang == 'vi' 
+      titleCtrl.text = widget.lang == 'vi' ? 'Rất thất vọng' : 'Very Disappointed';
+      reviewCtrl.text = widget.lang == 'vi' 
           ? 'Kích thước quá nhỏ so với mô tả, vải mỏng chỉ dùng làm giẻ lau được.' 
           : 'Runs extremely small, cheap fabric quality. Would not buy again.';
     });
@@ -207,19 +258,24 @@ class _EcommercePredictScreenState extends State<EcommercePredictScreen> with Si
 
   @override
   Widget build(BuildContext context) {
+    final isDark = widget.isDarkMode;
+    final inputBg = isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC);
+    final primaryHex = isDark ? const Color(0xFF8B5CF6) : const Color(0xFF7C3AED);
+
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color(0xFF0F172A),
+        backgroundColor: isDark ? const Color(0xFF0F172A) : Colors.white,
         elevation: 0,
+        scrolledUnderElevation: 1,
         title: Row(
           children: [
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: const Color(0xFF8B5CF6).withOpacity(0.2),
+                color: primaryHex.withOpacity(0.15),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: const Icon(Icons.shopping_bag, color: Color(0xFF8B5CF6)),
+              child: Icon(Icons.shopping_bag, color: primaryHex),
             ),
             const SizedBox(width: 12),
             Column(
@@ -231,34 +287,36 @@ class _EcommercePredictScreenState extends State<EcommercePredictScreen> with Si
                 ),
                 Text(
                   tr('Dự đoán đề xuất & Phân tích Cảm xúc', 'Recommendation & Sentiment AI'),
-                  style: const TextStyle(fontSize: 11, color: Color(0xFF94A3B8)),
+                  style: TextStyle(fontSize: 11, color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
                 ),
               ],
             ),
           ],
         ),
         actions: [
+          // Theme Switcher Button
+          IconButton(
+            onPressed: widget.onToggleTheme,
+            icon: Icon(isDark ? Icons.light_mode : Icons.dark_mode, size: 20),
+            tooltip: isDark ? 'Chuyển Chế độ Sáng' : 'Chuyển Chế độ Tối',
+          ),
           // Language Switcher Button
           Padding(
             padding: const EdgeInsets.only(right: 12),
             child: ActionChip(
-              avatar: Text(lang == 'vi' ? '🇻🇳' : '🇬🇧', style: const TextStyle(fontSize: 14)),
-              label: Text(lang.toUpperCase(), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
-              backgroundColor: const Color(0xFF1E293B),
-              side: const BorderSide(color: Color(0xFF334155)),
-              onPressed: () {
-                setState(() {
-                  lang = lang == 'vi' ? 'en' : 'vi';
-                });
-              },
+              avatar: Text(widget.lang == 'vi' ? '🇻🇳' : '🇬🇧', style: const TextStyle(fontSize: 14)),
+              label: Text(widget.lang.toUpperCase(), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+              backgroundColor: isDark ? const Color(0xFF1E293B) : const Color(0xFFFCE7F3),
+              side: BorderSide(color: isDark ? const Color(0xFF334155) : const Color(0xFFFBCFE8)),
+              onPressed: widget.onToggleLang,
             ),
           ),
         ],
         bottom: TabBar(
           controller: _tabController,
-          indicatorColor: const Color(0xFF8B5CF6),
-          labelColor: const Color(0xFF8B5CF6),
-          unselectedLabelColor: const Color(0xFF94A3B8),
+          indicatorColor: primaryHex,
+          labelColor: primaryHex,
+          unselectedLabelColor: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
           tabs: [
             Tab(icon: const Icon(Icons.rate_review_outlined, size: 20), text: tr('1. Đánh Giá Cấu Trúc', '1. Tabular Review')),
             Tab(icon: const Icon(Icons.psychology, size: 20), text: tr('2. Phân Tích NLP / Text', '2. NLP Text Model')),
@@ -278,11 +336,11 @@ class _EcommercePredictScreenState extends State<EcommercePredictScreen> with Si
                   children: [
                     Row(
                       children: [
-                        const Icon(Icons.dns, size: 18, color: Color(0xFF8B5CF6)),
+                        Icon(Icons.dns, size: 18, color: primaryHex),
                         const SizedBox(width: 8),
                         Text(
                           tr('Cấu hình Kết nối Server API', 'API Connection Settings'),
-                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Color(0xFF8B5CF6)),
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: primaryHex),
                         ),
                       ],
                     ),
@@ -295,7 +353,7 @@ class _EcommercePredictScreenState extends State<EcommercePredictScreen> with Si
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                         isDense: true,
                         filled: true,
-                        fillColor: const Color(0xFF0F172A),
+                        fillColor: inputBg,
                       ),
                     ),
                   ],
@@ -323,7 +381,7 @@ class _EcommercePredictScreenState extends State<EcommercePredictScreen> with Si
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text(tr('Điền mẫu thử nhanh:', 'Quick sample presets:'), style: const TextStyle(fontSize: 12, color: Color(0xFF94A3B8))),
+                                    Text(tr('Điền mẫu thử nhanh:', 'Quick sample presets:'), style: TextStyle(fontSize: 12, color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B))),
                                     Row(
                                       children: [
                                         TextButton.icon(
@@ -373,7 +431,7 @@ class _EcommercePredictScreenState extends State<EcommercePredictScreen> with Si
                                           border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                                           isDense: true,
                                           filled: true,
-                                          fillColor: const Color(0xFF0F172A),
+                                          fillColor: inputBg,
                                         ),
                                       ),
                                     ),
@@ -388,7 +446,7 @@ class _EcommercePredictScreenState extends State<EcommercePredictScreen> with Si
                                           border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                                           isDense: true,
                                           filled: true,
-                                          fillColor: const Color(0xFF0F172A),
+                                          fillColor: inputBg,
                                         ),
                                       ),
                                     ),
@@ -403,7 +461,7 @@ class _EcommercePredictScreenState extends State<EcommercePredictScreen> with Si
                                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                                     isDense: true,
                                     filled: true,
-                                    fillColor: const Color(0xFF0F172A),
+                                    fillColor: inputBg,
                                   ),
                                 ),
                                 const SizedBox(height: 12),
@@ -415,7 +473,7 @@ class _EcommercePredictScreenState extends State<EcommercePredictScreen> with Si
                                     labelText: tr('Nội dung Đánh giá sản phẩm', 'Review Text'),
                                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                                     filled: true,
-                                    fillColor: const Color(0xFF0F172A),
+                                    fillColor: inputBg,
                                   ),
                                 ),
                                 const SizedBox(height: 14),
@@ -428,7 +486,7 @@ class _EcommercePredictScreenState extends State<EcommercePredictScreen> with Si
                                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                                     isDense: true,
                                     filled: true,
-                                    fillColor: const Color(0xFF0F172A),
+                                    fillColor: inputBg,
                                   ),
                                   items: divisions.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
                                   onChanged: (v) => setState(() => division = v!),
@@ -445,7 +503,7 @@ class _EcommercePredictScreenState extends State<EcommercePredictScreen> with Si
                                           border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                                           isDense: true,
                                           filled: true,
-                                          fillColor: const Color(0xFF0F172A),
+                                          fillColor: inputBg,
                                         ),
                                         items: departments.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
                                         onChanged: (v) => setState(() => department = v!),
@@ -460,7 +518,7 @@ class _EcommercePredictScreenState extends State<EcommercePredictScreen> with Si
                                           border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                                           isDense: true,
                                           filled: true,
-                                          fillColor: const Color(0xFF0F172A),
+                                          fillColor: inputBg,
                                         ),
                                         items: classes.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
                                         onChanged: (v) => setState(() => klass = v!),
@@ -479,8 +537,8 @@ class _EcommercePredictScreenState extends State<EcommercePredictScreen> with Si
                           height: 50,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(14),
-                            gradient: const LinearGradient(
-                              colors: [Color(0xFF8B5CF6), Color(0xFFEC4899)],
+                            gradient: LinearGradient(
+                              colors: [primaryHex, const Color(0xFFEC4899)],
                             ),
                           ),
                           child: ElevatedButton(
@@ -507,7 +565,9 @@ class _EcommercePredictScreenState extends State<EcommercePredictScreen> with Si
                         // Tab 1 Result
                         if (resultTextTab1 != null) ...[
                           Card(
-                            color: isRecommendedTab1 == true ? const Color(0xFF064E3B) : const Color(0xFF451A1A),
+                            color: isRecommendedTab1 == true 
+                                ? (isDark ? const Color(0xFF064E3B) : const Color(0xFFECFDF5))
+                                : (isDark ? const Color(0xFF451A1A) : const Color(0xFFFEF2F2)),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(16),
                               side: BorderSide(
@@ -522,7 +582,7 @@ class _EcommercePredictScreenState extends State<EcommercePredictScreen> with Si
                                   Icon(
                                     isRecommendedTab1 == true ? Icons.recommend : Icons.do_not_disturb_on,
                                     size: 42,
-                                    color: isRecommendedTab1 == true ? const Color(0xFF34D399) : const Color(0xFFF87171),
+                                    color: isRecommendedTab1 == true ? const Color(0xFF10B981) : const Color(0xFFEF4444),
                                   ),
                                   const SizedBox(height: 8),
                                   Text(
@@ -530,14 +590,14 @@ class _EcommercePredictScreenState extends State<EcommercePredictScreen> with Si
                                     style: TextStyle(
                                       fontSize: 22,
                                       fontWeight: FontWeight.bold,
-                                      color: isRecommendedTab1 == true ? const Color(0xFF34D399) : const Color(0xFFF87171),
+                                      color: isRecommendedTab1 == true ? const Color(0xFF10B981) : const Color(0xFFEF4444),
                                     ),
                                   ),
                                   if (probTab1 != null) ...[
                                     const SizedBox(height: 6),
                                     Text(
                                       tr('Xác suất Đề xuất: ${(probTab1! * 100).toStringAsFixed(1)}%', 'Recommendation Probability: ${(probTab1! * 100).toStringAsFixed(1)}%'),
-                                      style: const TextStyle(fontSize: 13, color: Color(0xFFE2E8F0)),
+                                      style: TextStyle(fontSize: 13, color: isDark ? const Color(0xFFE2E8F0) : const Color(0xFF334155)),
                                     ),
                                   ],
                                 ],
@@ -575,7 +635,7 @@ class _EcommercePredictScreenState extends State<EcommercePredictScreen> with Si
                                     labelText: tr('Nhập bất kỳ đoạn đánh giá sản phẩm nào...', 'Enter any product review text...'),
                                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                                     filled: true,
-                                    fillColor: const Color(0xFF0F172A),
+                                    fillColor: inputBg,
                                   ),
                                 ),
                                 const SizedBox(height: 16),
@@ -584,8 +644,8 @@ class _EcommercePredictScreenState extends State<EcommercePredictScreen> with Si
                                   width: double.infinity,
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(12),
-                                    gradient: const LinearGradient(
-                                      colors: [Color(0xFFEC4899), Color(0xFF8B5CF6)],
+                                    gradient: LinearGradient(
+                                      colors: [const Color(0xFFEC4899), primaryHex],
                                     ),
                                   ),
                                   child: ElevatedButton.icon(
@@ -608,7 +668,9 @@ class _EcommercePredictScreenState extends State<EcommercePredictScreen> with Si
 
                         if (resultTextTab2 != null) ...[
                           Card(
-                            color: isRecommendedTab2 == true ? const Color(0xFF064E3B) : const Color(0xFF451A1A),
+                            color: isRecommendedTab2 == true 
+                                ? (isDark ? const Color(0xFF064E3B) : const Color(0xFFECFDF5))
+                                : (isDark ? const Color(0xFF451A1A) : const Color(0xFFFEF2F2)),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(16),
                               side: BorderSide(
@@ -623,7 +685,7 @@ class _EcommercePredictScreenState extends State<EcommercePredictScreen> with Si
                                   Icon(
                                     isRecommendedTab2 == true ? Icons.sentiment_very_satisfied : Icons.sentiment_very_dissatisfied,
                                     size: 42,
-                                    color: isRecommendedTab2 == true ? const Color(0xFF34D399) : const Color(0xFFF87171),
+                                    color: isRecommendedTab2 == true ? const Color(0xFF10B981) : const Color(0xFFEF4444),
                                   ),
                                   const SizedBox(height: 8),
                                   Text(
@@ -631,14 +693,14 @@ class _EcommercePredictScreenState extends State<EcommercePredictScreen> with Si
                                     style: TextStyle(
                                       fontSize: 22,
                                       fontWeight: FontWeight.bold,
-                                      color: isRecommendedTab2 == true ? const Color(0xFF34D399) : const Color(0xFFF87171),
+                                      color: isRecommendedTab2 == true ? const Color(0xFF10B981) : const Color(0xFFEF4444),
                                     ),
                                   ),
                                   if (probTab2 != null) ...[
                                     const SizedBox(height: 6),
                                     Text(
                                       tr('Tỷ lệ Đề xuất (Confidence): ${(probTab2! * 100).toStringAsFixed(1)}%', 'Recommendation Confidence: ${(probTab2! * 100).toStringAsFixed(1)}%'),
-                                      style: const TextStyle(fontSize: 13, color: Color(0xFFE2E8F0)),
+                                      style: TextStyle(fontSize: 13, color: isDark ? const Color(0xFFE2E8F0) : const Color(0xFF334155)),
                                     ),
                                   ],
                                 ],
