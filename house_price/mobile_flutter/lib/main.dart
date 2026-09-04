@@ -298,40 +298,7 @@ class _HousePricePredictScreenState extends State<HousePricePredictScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // API Server Config Card
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(14),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Icon(Icons.dns, size: 18, color: primaryHex),
-                        const SizedBox(width: 8),
-                        Text(
-                          tr('Cấu hình Kết nối Server API', 'API Connection Settings'),
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: primaryHex),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 10),
-                    TextField(
-                      controller: apiUrlCtrl,
-                      decoration: InputDecoration(
-                        labelText: 'API Base URL',
-                        prefixIcon: const Icon(Icons.link, size: 20),
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-                        isDense: true,
-                        filled: true,
-                        fillColor: inputBg,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 14),
+            // API Server Config Card hidden — apiUrlCtrl keeps its preset value.
 
             // Section 1: Vị trí & Pháp lý
             Card(
